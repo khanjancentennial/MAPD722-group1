@@ -29,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.homeScreenColor,
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -37,25 +37,13 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: const EdgeInsets.only(top: 50, right: 20, left: 20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                // crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 50),
-                  Center(
-                    child: SizedBox(
-                      // color: Colors.red,
-                      height: 100,
-                      child: Image.asset(
-                        AppImage.appLogo,
-                        width: 200,
-                      ),
-                    ),
-                  ),
+                  const SizedBox(height: 100),
 
-                  const SizedBox(height: 40),
-
-                  Text("Welcome Back!",
+                  Text("Login!",
                   style: AppUtils.instance.textStyle(
-                    fontSize:30,
+                    fontSize:36,
                     color: AppColors.black
                   )
                   ),
@@ -170,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 60,
                     width: MediaQuery.of(context).size.width,
                     text: "Login",
-                    textColor: AppColors.black,
+                    textColor: AppColors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 20)
 

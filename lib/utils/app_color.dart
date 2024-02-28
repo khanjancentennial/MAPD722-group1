@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 class AppColors{
   // static const Color buttonColor = Color.fromRGBO(42, 87, 165, 1.0);
-  static const Color buttonColor = Color.fromRGBO(254, 191, 0, 1.0);
+  static const Color buttonColor = Color.fromRGBO(136, 8, 8, 1.0);
   static const Color backgroundColor = Color.fromRGBO(239, 238, 237, 1.0);
-  static const Color homeScreenColor = Color.fromRGBO(236, 224, 184, 1.0);
+  static const Color homeScreenColor = Color.fromRGBO(225, 206, 206, 1.0);
   static const Color green = Colors.green;
   static const Color grey = Colors.grey;
   static const Color white = Colors.white;

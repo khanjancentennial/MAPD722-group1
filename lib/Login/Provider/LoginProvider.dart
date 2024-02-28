@@ -29,7 +29,9 @@ class LoginProvider extends ChangeNotifier {
     };
     try {
           http.Response response =
-          await http.post(Uri.parse(ApiNetwork.LOGIN_URL), body: loginDataBody);
+          await http.post(Uri.parse(ApiNetwork.LOGIN_URL),
+              // headers: {"Content-Type": "application/json"},
+              body: loginDataBody);
           if (response.statusCode == 200) {
             loginData = LoginModel.fromJson(json.decode(response.body));
 

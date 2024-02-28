@@ -72,7 +72,7 @@ class CommonAppBar extends PreferredSize {
                       Flexible(
                         child: Container(
                           height: 50,
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                             left: 8,
                             right: 5,
                             bottom: 5,

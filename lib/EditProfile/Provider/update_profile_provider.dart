@@ -10,78 +10,70 @@ import '../../utils/api_network.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/exceptions.dart';
-import '../Model/registration_model.dart';
+import '../Model/update_profile_model.dart';
 
-class RegistrationProvider extends ChangeNotifier {
-  late RegistrationModel registrationModel;
+class UpdateProfileProvider extends ChangeNotifier {
+  late UpdateProfileModel updateProfileModel;
   bool isLoading=false;
   bool isFemale = false;
   bool isMale = false;
-  bool isDoctor = false;
-  bool isNurse = false;
 
-  Future<RegistrationModel?> addUserDetails(
-  BuildContext context,
+
+  Future<UpdateProfileModel?> updateUserDetails(
+      BuildContext context,
+      String userId,
       String firstName,
       String lastName,
       String emailId,
-      String password,
       String phoneNumber,
-      String gender,
-      String userType
+      int gender,
+      int userType
       ) async {
 
-    print(gender.runtimeType);
-    print(userType.runtimeType);
-    print(phoneNumber.runtimeType);
-
+    print(gender);
     startLoading();
-    Map<String, dynamic> registrationBody = {
-
+    Map<String, dynamic> updateUserBody = {
       "firstName": firstName,
       "lastName": lastName,
-      "email": emailId,
       "gender":gender,
       "phoneNumber": phoneNumber,
-      "password" : password,
       "healthcareProvider": userType,
     };
     try {
       http.Response response =
-      await http.post(Uri.parse(ApiNetwork.REGISTER_URL),
-          // headers: {"Content-Type": "application/json"},
-          body: registrationBody);
+      await http.put(Uri.parse("${ApiNetwork.USER_URL}/${userId}"),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(updateUserBody)
+      );
       print(response);
       if (response.statusCode == 200) {
-        registrationModel = RegistrationModel.fromJson(json.decode(response.body));
+        updateProfileModel = UpdateProfileModel.fromJson(json.decode(response.body));
 
-        if(registrationModel.success== true){
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-          );
+        if(updateProfileModel.success== true){
+          // Navigator.pushReplacement(context, newRoute)
+
           AppUtils.instance.showToast(
               textColor: Colors.white,
               backgroundColor: AppColors.green,
-              toastMessage: registrationModel.message);
+              toastMessage: updateProfileModel.message);
           stopLoading();
           notifyListeners();
         }else{
           AppUtils.instance.showToast(
               textColor: Colors.white,
               backgroundColor: AppColors.red,
-              toastMessage: registrationModel.message);
+              toastMessage: updateProfileModel.message);
           stopLoading();
           notifyListeners();
         }
 
       } else {
-        registrationModel = RegistrationModel.fromJson(json.decode(response.body));
+        updateProfileModel = UpdateProfileModel.fromJson(json.decode(response.body));
         stopLoading();
         AppUtils.instance.showToast(
             textColor: Colors.white,
             backgroundColor: AppColors.red,
-            toastMessage: registrationModel.message);
+            toastMessage: updateProfileModel.message);
         notifyListeners();
 
       }
@@ -106,7 +98,7 @@ class RegistrationProvider extends ChangeNotifier {
 
     }
     notifyListeners();
-    return registrationModel;
+    return updateProfileModel;
   }
 
   void startLoading(){
@@ -150,16 +142,5 @@ class RegistrationProvider extends ChangeNotifier {
     }
   }
 
-  void healthCareCheck(String healthCare){
-    if(healthCare == "Doctor"){
-      isDoctor = !isDoctor;
-      isNurse = false;
-      notifyListeners();
-    }else{
-      isNurse = !isNurse;
-      isDoctor = false;
-      notifyListeners();
-    }
-  }
 
 }

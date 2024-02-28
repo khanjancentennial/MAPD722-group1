@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mapd722_group1/EditProfile/Model/profile_model.dart';
 import 'dart:async';
 
 import '../../Login/LoginScreen.dart';
@@ -10,79 +11,74 @@ import '../../utils/api_network.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/exceptions.dart';
-import '../Model/registration_model.dart';
 
-class RegistrationProvider extends ChangeNotifier {
-  late RegistrationModel registrationModel;
+class UserProfileProvider extends ChangeNotifier {
+  late ProfileModel getUserModel;
   bool isLoading=false;
   bool isFemale = false;
   bool isMale = false;
   bool isDoctor = false;
   bool isNurse = false;
 
-  Future<RegistrationModel?> addUserDetails(
-  BuildContext context,
-      String firstName,
-      String lastName,
-      String emailId,
-      String password,
-      String phoneNumber,
-      String gender,
-      String userType
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController address = TextEditingController();
+
+  Future<ProfileModel?> getUserDetails(
+      String userId,
       ) async {
 
-    print(gender.runtimeType);
-    print(userType.runtimeType);
-    print(phoneNumber.runtimeType);
-
     startLoading();
-    Map<String, dynamic> registrationBody = {
 
-      "firstName": firstName,
-      "lastName": lastName,
-      "email": emailId,
-      "gender":gender,
-      "phoneNumber": phoneNumber,
-      "password" : password,
-      "healthcareProvider": userType,
-    };
     try {
+      firstNameController.text =  "";
+      lastNameController.text =  "";
+      emailController.text =  "";
+      phoneController.text =  "";
+      address.text =  "";
+      isMale = false;
+      isFemale = false;
       http.Response response =
-      await http.post(Uri.parse(ApiNetwork.REGISTER_URL),
-          // headers: {"Content-Type": "application/json"},
-          body: registrationBody);
+      await http.get(Uri.parse("${ApiNetwork.USER_URL}/$userId"));
       print(response);
       if (response.statusCode == 200) {
-        registrationModel = RegistrationModel.fromJson(json.decode(response.body));
+        getUserModel = ProfileModel.fromJson(json.decode(response.body));
 
-        if(registrationModel.success== true){
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-          );
-          AppUtils.instance.showToast(
-              textColor: Colors.white,
-              backgroundColor: AppColors.green,
-              toastMessage: registrationModel.message);
+        if(getUserModel.success== true){
+
+          firstNameController.text =  firstNameController.text == "" ? getUserModel.data!.firstName! : firstNameController.text;
+          lastNameController.text =  lastNameController.text == "" ? getUserModel.data!.lastName! : lastNameController.text;
+          emailController.text =  emailController.text == "" ? getUserModel.data!.email! : emailController.text;
+          phoneController.text =  phoneController.text == "" ? getUserModel.data!.phoneNumber! : phoneController.text;
+          isMale = getUserModel.data!.gender == 0 ? true: false;
+          isFemale = getUserModel.data!.gender == 1 ? true: false;
+          isDoctor = getUserModel.data!.healthcareProvider == 0 ? true: false;
+          isNurse = getUserModel.data!.healthcareProvider == 1 ? true: false;
+          // AppUtils.instance.showToast(
+          //     textColor: Colors.white,
+          //     backgroundColor: AppColors.green,
+          //     toastMessage: getUserModel.message);
           stopLoading();
           notifyListeners();
         }else{
-          AppUtils.instance.showToast(
-              textColor: Colors.white,
-              backgroundColor: AppColors.red,
-              toastMessage: registrationModel.message);
+          // AppUtils.instance.showToast(
+          //     textColor: Colors.white,
+          //     backgroundColor: AppColors.red,
+          //     toastMessage: getUserModel.message);
           stopLoading();
           notifyListeners();
         }
 
       } else {
-        registrationModel = RegistrationModel.fromJson(json.decode(response.body));
         stopLoading();
-        AppUtils.instance.showToast(
-            textColor: Colors.white,
-            backgroundColor: AppColors.red,
-            toastMessage: registrationModel.message);
+        // AppUtils.instance.showToast(
+        //     textColor: Colors.white,
+        //     backgroundColor: AppColors.red,
+        //     toastMessage: registrationModel.message);
         notifyListeners();
+        getUserModel = ProfileModel.fromJson(json.decode(response.body));
 
       }
       notifyListeners();
@@ -106,7 +102,7 @@ class RegistrationProvider extends ChangeNotifier {
 
     }
     notifyListeners();
-    return registrationModel;
+    return getUserModel;
   }
 
   void startLoading(){
@@ -149,17 +145,4 @@ class RegistrationProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  void healthCareCheck(String healthCare){
-    if(healthCare == "Doctor"){
-      isDoctor = !isDoctor;
-      isNurse = false;
-      notifyListeners();
-    }else{
-      isNurse = !isNurse;
-      isDoctor = false;
-      notifyListeners();
-    }
-  }
-
 }

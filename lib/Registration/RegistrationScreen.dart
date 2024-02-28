@@ -39,7 +39,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+        backgroundColor: AppColors.homeScreenColor,
       body: Form(
         key: _formKey,
         child:
@@ -47,22 +47,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 child: Padding(
                   padding: const EdgeInsets.only(top: 50, right: 20, left: 20),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 30),
-                      Center(
-                        child: Image.asset(
-                            AppImage.appLogo,
-                            height: 100,
-                          width: 200,
-                        ),
-                      ),
 
                       const SizedBox(height: 40),
 
-                      Text("Create New Account!",
+                      Text("Registration!",
                           style: AppUtils.instance.textStyle(
-                              fontSize:30,
+                              fontSize:36,
                               color: AppColors.black
                           )
                       ),
@@ -285,8 +276,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                             },
                           ),
 
-                          const SizedBox(height: 20),
-
                           // gender
                           const SizedBox(height: 20),
                           Text("Gender:",
@@ -486,7 +475,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           const SizedBox(),
 
 
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 40),
 
                           Consumer<RegistrationProvider>(
                             builder: (_, isLoading, child) =>
@@ -515,7 +504,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               height: 60,
                               width: MediaQuery.of(context).size.width,
                               text: "Registration",
-                              textColor: AppColors.black,
+                              textColor: AppColors.white,
                               fontWeight: FontWeight.bold,
                               fontSize: 20)
                           ),
@@ -526,7 +515,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               const Spacer(),
 
                               Text(
-                                "Existing User ",
+                                "Existing User? ",
                                 style: AppUtils.instance.textStyle(
                                   color: AppColors.black,
                                 ),
@@ -542,7 +531,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   );
                                 },
                                 child: Text(
-                                  "Login Here?",
+                                  "Login Here",
                                   style: AppUtils.instance.textStyle(
                                     color: AppColors.buttonColor,
                                   ),
@@ -564,7 +553,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
   void validations() async {
 
-    if(Provider.of<RegistrationProvider>(context,listen: false).isMale || Provider.of<RegistrationProvider>(context,listen: false).isFemale){
+    if(Provider.of<RegistrationProvider>(context,listen: false).isMale ||
+        Provider.of<RegistrationProvider>(context,listen: false).isFemale ||
+        Provider.of<RegistrationProvider>(context,listen: false).isDoctor ||
+        Provider.of<RegistrationProvider>(context,listen: false).isNurse
+    ){
       isFirstTime = false;
       setState(() {
 
@@ -579,18 +572,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     if(_formKey.currentState!.validate()){
 
-        Provider.of<RegistrationProvider>(context, listen: false).addUserDetails(
-          context,
-          firstName.text,
-          lastName.text,
-          emailController.text,
-          addressController.text,
-          passwordController.text,
-          phoneController.text,
-          Provider.of<RegistrationProvider>(context,listen: false).isMale ? "Male" : "Female",
-          "Customer"
+      if((Provider.of<RegistrationProvider>(context,listen: false).isMale ||
+          Provider.of<RegistrationProvider>(context,listen: false).isFemale) &&
+          (Provider.of<RegistrationProvider>(context,listen: false).isDoctor ||
+          Provider.of<RegistrationProvider>(context,listen: false).isNurse)){
 
+        Provider.of<RegistrationProvider>(context, listen: false).addUserDetails(
+            context,
+            firstName.text,
+            lastName.text,
+            emailController.text,
+            passwordController.text,
+            phoneController.text,
+            Provider.of<RegistrationProvider>(context,listen: false).isMale ? "0" : "1",
+            Provider.of<RegistrationProvider>(context,listen: false).isDoctor? "0" : "1"
         );
+
+      }else{}
+
+
         //     .then((value) {
         //
         //   if (value!.success == true){
