@@ -10,7 +10,18 @@ import '../utils/app_utils.dart';
 import 'Model/clinical_test_model.dart';
 
 class AllClinicalTestScreen extends StatefulWidget {
-  const AllClinicalTestScreen({super.key});
+
+  String? firstName;
+  String? lastName;
+  String? emailId;
+  String? phoneNumber;
+  String? height;
+  String? weight;
+  String? address;
+  String? patientId;
+
+
+  AllClinicalTestScreen({super.key,this.firstName,this.lastName,this.address,this.height,this.weight,this.emailId,this.phoneNumber,this.patientId});
 
   @override
   State<AllClinicalTestScreen> createState() => _AllClinicalTestScreenState();
@@ -86,7 +97,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           ),
                           Container(
                             child: Center(
-                              child: Text("Khanjan",
+                              child: Text(widget.firstName!,
                                   style: AppUtils.instance.textStyle(
                                       fontSize: 16,
                                       color: AppColors.black
@@ -117,7 +128,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           ),
                           Container(
                             child: Center(
-                              child: Text("Dave",
+                              child: Text(widget.lastName!,
                                   style: AppUtils.instance.textStyle(
                                       fontSize: 16,
                                       color: AppColors.black
@@ -153,7 +164,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           ),
                           Container(
                             child: Center(
-                              child: Text("Khanjan@gmail.com",
+                              child: Text(widget.emailId!,
                                   style: AppUtils.instance.textStyle(
                                       fontSize: 16,
                                       color: AppColors.black
@@ -184,7 +195,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           ),
                           Container(
                             child: Center(
-                              child: Text("1234567890",
+                              child: Text(widget.phoneNumber!,
                                   style: AppUtils.instance.textStyle(
                                       fontSize: 16,
                                       color: AppColors.black
@@ -219,7 +230,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           ),
                           Container(
                             child: Center(
-                              child: Text("170 CM",
+                              child: Text(widget.height!,
                                   style: AppUtils.instance.textStyle(
                                       fontSize: 16,
                                       color: AppColors.black
@@ -250,7 +261,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           ),
                           Container(
                             child: Center(
-                              child: Text("70 KG",
+                              child: Text(widget.weight!,
                                   style: AppUtils.instance.textStyle(
                                       fontSize: 16,
                                       color: AppColors.black
@@ -286,7 +297,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           ),
                           Container(
                             child: Center(
-                              child: Text("12, Markham, Canada",
+                              child: Text(widget.address!,
                                   style: AppUtils.instance.textStyle(
                                       fontSize: 16,
                                       color: AppColors.black

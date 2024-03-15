@@ -11,17 +11,19 @@ import '../../utils/api_network.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/exceptions.dart';
-import '../Model/add_patient_model.dart';
+import '../Model/edit_patient_model.dart';
 
-class AddPatientProvider extends ChangeNotifier {
-  late AddPatientDetails addPatientDetails;
+class EditPatientProvider extends ChangeNotifier {
+  late EditPatientModel editPatientModel;
   bool isLoading=false;
   bool isFemale = false;
   bool isMale = false;
   bool isDoctor = false;
   bool isNurse = false;
 
-  Future<AddPatientDetails?> addPatient(
+
+
+  Future<EditPatientModel?> editPatient(
       BuildContext context,
       String firstName,
       String lastName,
@@ -31,61 +33,59 @@ class AddPatientProvider extends ChangeNotifier {
       String height,
       String address,
       String gender,
-      String userFirstName,
-      String userLastName
+      String patientId
       ) async {
 
 
+
     startLoading();
-    Map<String, dynamic> patientDetailsBody = {
+    Map<String, dynamic> registrationBody = {
 
       "firstName": firstName,
       "lastName": lastName,
       "email": emailId,
       "gender":gender,
       "phoneNumber": phoneNumber,
-      "weight" : weight,
-      "height" : height,
-      "address" : address,
-
+      "height": height,
+      "weight": weight,
+      "address": address,
     };
     try {
       http.Response response =
-      await http.post(Uri.parse(ApiNetwork.ADD_PATIENT_DETAILS),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(patientDetailsBody)
-      );
+      await http.put(Uri.parse("${ApiNetwork.EDIT_PATIENT_DETAILS}/$patientId"),
+          // headers: {"Content-Type": "application/json"},
+          body: registrationBody);
       print(response);
-      if (response.statusCode == 201) {
-        addPatientDetails = AddPatientDetails.fromJson(json.decode(response.body));
+      if (response.statusCode == 200) {
+        editPatientModel = EditPatientModel.fromJson(json.decode(response.body));
 
-        if(addPatientDetails.success== true){
+        if(editPatientModel.success== true){
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen(firstName: userFirstName,lastName: userLastName,)),
+            MaterialPageRoute(builder: (context) => HomeScreen(lastName: lastName,firstName: firstName)),
           );
           AppUtils.instance.showToast(
               textColor: Colors.white,
               backgroundColor: AppColors.green,
-              toastMessage: addPatientDetails.message);
+              toastMessage: editPatientModel.message);
           stopLoading();
           notifyListeners();
         }else{
           AppUtils.instance.showToast(
               textColor: Colors.white,
               backgroundColor: AppColors.red,
-              toastMessage: addPatientDetails.message);
+              toastMessage: editPatientModel.message);
           stopLoading();
           notifyListeners();
         }
 
       } else {
-        addPatientDetails = AddPatientDetails.fromJson(json.decode(response.body));
+        editPatientModel = EditPatientModel.fromJson(json.decode(response.body));
         stopLoading();
         AppUtils.instance.showToast(
             textColor: Colors.white,
             backgroundColor: AppColors.red,
-            toastMessage: addPatientDetails.message);
+            toastMessage: editPatientModel.message);
         notifyListeners();
 
       }
@@ -110,7 +110,7 @@ class AddPatientProvider extends ChangeNotifier {
 
     }
     notifyListeners();
-    return addPatientDetails;
+    return editPatientModel;
   }
 
   void startLoading(){

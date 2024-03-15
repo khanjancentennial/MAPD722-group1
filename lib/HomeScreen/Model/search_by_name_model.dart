@@ -1,10 +1,10 @@
-class AllPatientDetailsModel {
+class SearchByNameModel {
   bool? success;
   List<Data>? data;
 
-  AllPatientDetailsModel({this.success, this.data});
+  SearchByNameModel({this.success, this.data});
 
-  AllPatientDetailsModel.fromJson(Map<String, dynamic> json) {
+  SearchByNameModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     if (json['data'] != null) {
       data = <Data>[];

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mapd722_group1/EditPatient/edit_patient_screen.dart';
+import 'package:mapd722_group1/HomeScreen/Provider/search_by_name_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../AddPatient/add_patient_screen.dart';
@@ -13,6 +14,8 @@ import '../utils/app_utils.dart';
 import '../utils/custome_popup.dart';
 import '../utils/preference_key.dart';
 import 'Model/home_screen_model.dart';
+import 'Provider/delete_patient_data_provider.dart';
+import 'Provider/get_all_patient_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   String? firstName;
@@ -24,13 +27,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController searchController = TextEditingController();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) => getDetails());
+  }
 
-  List<HomeScreenData> homeScreenData = [
-    HomeScreenData("Khanjan Dave", "khanjan@gmail.com", "Critical"),
-    HomeScreenData("Khanjan Dave", "khanjan@gmail.com", "Normal"),
-    HomeScreenData("Khanjan Dave", "khanjan@gmail.com", "Normal")
-  ];
+  Future<void>? getDetails() async {
+    if (this.mounted) {
+      Provider.of<GetAllPatientProvider>(context, listen: false).getAllPatientDetails();
+      // Provider.of<SearchByNameProvider>(context,listen: false).getPatientByName("");
+      setState(() {});
 
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: TextFormField(
                                 style: const TextStyle(color: AppColors.labelColor),
                                 onTap: () {},
-                                // controller: emailController,
+                                controller: searchController,
                                 // focusNode: myFocusNodeEmail,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.only(top: 5,bottom: 5),
@@ -213,181 +225,452 @@ class _HomeScreenState extends State<HomeScreen> {
                                   prefixIcon: Icon(Icons.search_outlined,)
                                 ),
 
-                                // onChanged: (emailValue){
-                                //   Provider.of<LoginProvider>(context,listen: false).emailStructure(emailValue);
-                                //   // print(emailValue);
-                                // },
+                                onChanged: (value){
+                                  Provider.of<SearchByNameProvider>(context,listen: false).getPatientByName(value);
+                                  // print(emailValue);
+                                },
                               ),
                             ),
                           ),
                           const SizedBox(height: 30),
-                          ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: homeScreenData.length,
-                              itemBuilder: (context,index){
-                                return Padding(
-                                  padding: const EdgeInsets.only(left: 15,right: 15,bottom: 10),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        width:MediaQuery.of(context).size.width,
-                                        child: Card(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(10),
-                                            child: Column(
-                                              children: [
-                                                Row(
+
+                          searchController.text.isNotEmpty ?
+                          Consumer<SearchByNameProvider>(
+                              builder: (_, searchByName, child) =>
+                              searchByName.isLoading  == false ?
+
+                                  searchByName.searchByNameModel.success == false ?
+                                      Center(
+                                          child:
+                                          Text("No Data Found",
+                                          style: AppUtils.instance.textStyle(
+                                            color: AppColors.buttonColor,
+                                            fontSize: 30,
+                                            fontWeight: FontWeight.bold
+                                          )
+                                          )
+                                      )
+                                      :
+                              ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount:
+                                  searchByName.searchByNameModel.data!.length
+                                  ,
+                                  itemBuilder: (context,index){
+                                    return Padding(
+                                      padding: const EdgeInsets.only(left: 15,right: 15,bottom: 10),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            width:MediaQuery.of(context).size.width,
+                                            child: Card(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(10),
+                                                child: Column(
                                                   children: [
-                                                    Flexible(
-                                                      fit:FlexFit.tight,
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(homeScreenData[index].name!,
-                                                            style: AppUtils.instance.textStyle(
-                                                              fontSize: 26,
-                                                              fontWeight: FontWeight.bold
-                                                            )
-                                                          ),
-                                                          const SizedBox(height: 5),
-                                                          Text("Email id:- ${homeScreenData[index].emailId!}",
-                                                            style: AppUtils.instance.textStyle(
-                                                                fontSize: 16,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(height: 5),
-                                                          Text("Patient Status:- ${homeScreenData[index].status!}",
-                                                            style: AppUtils.instance.textStyle(
-                                                              fontSize: 16,
-                                                              color: homeScreenData[index].status! == "Critical" ? AppColors.red : AppColors.green
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 10),
-                                                    Column(
+                                                    Row(
                                                       children: [
-                                                        Row(
+                                                        Flexible(
+                                                          fit:FlexFit.tight,
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text("${
+                                                                  searchByName.searchByNameModel.data![index].firstName!} "
+                                                                  "${searchByName.searchByNameModel.data![index].lastName!}",
+                                                                  style: AppUtils.instance.textStyle(
+                                                                      fontSize: 26,
+                                                                      fontWeight: FontWeight.bold
+                                                                  )
+                                                              ),
+                                                              const SizedBox(height: 5),
+                                                              Text("Email id:- ${searchByName.searchByNameModel.data![index].email!}",
+                                                                style: AppUtils.instance.textStyle(
+                                                                  fontSize: 16,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(height: 5),
+                                                              // Text("Patient Status:- ${homeScreenData[index].status!}",
+                                                              //   style: AppUtils.instance.textStyle(
+                                                              //     fontSize: 16,
+                                                              //     color: homeScreenData[index].status! == "Critical" ? AppColors.red : AppColors.green
+                                                              //   ),
+                                                              // )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(width: 10),
+                                                        Column(
                                                           children: [
+                                                            Row(
+                                                              children: [
+                                                                InkWell(
+                                                                  onTap: (){
+                                                                    Navigator.push(context,
+                                                                        MaterialPageRoute(builder: (builder) =>
+                                                                            EditPatientDetails(
+                                                                              patientId: searchByName.searchByNameModel.data![index].sId,
+                                                                              firstName: searchByName.searchByNameModel.data![index].firstName!,
+                                                                              lastName: searchByName.searchByNameModel.data![index].lastName!,
+                                                                              address: searchByName.searchByNameModel.data![index].address!,
+                                                                              emailId: searchByName.searchByNameModel.data![index].email!,
+                                                                              phoneNumber: searchByName.searchByNameModel.data![index].phoneNumber!,
+                                                                              height: searchByName.searchByNameModel.data![index].height!,
+                                                                              weight: searchByName.searchByNameModel.data![index].weight!,
+                                                                              gender: searchByName.searchByNameModel.data![index].gender!,
+
+                                                                            )
+                                                                        )
+                                                                    );
+                                                                  },
+                                                                  child: Container(
+                                                                    height: 40,
+                                                                    width: 40,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius: BorderRadius.circular(10),
+                                                                        color: AppColors.buttonColor
+                                                                    ),
+                                                                    child: const Icon(Icons.edit,
+                                                                      color: AppColors.white,
+                                                                      size: 20,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(width: 10),
+                                                                InkWell(
+                                                                  onTap: (){
+                                                                    showDialog<String>(
+                                                                      context: context,
+                                                                      builder: (BuildContext context) => AlertDialog(
+                                                                        title: const Center(child: Text('Are you sure you want to delete patient record?')),
+                                                                        actions: <Widget>[
+                                                                          Row(
+                                                                            mainAxisAlignment : MainAxisAlignment.center,
+                                                                            children: [
+                                                                              TextButton(
+                                                                                onPressed: () => Navigator.pop(context, 'Cancel'),
+                                                                                child: Text('Cancel',
+                                                                                    style: AppUtils.instance.textStyle(
+                                                                                        fontWeight: FontWeight.bold,
+                                                                                        fontSize: 18,
+                                                                                        color: AppColors.green
+                                                                                    )
+                                                                                ),
+                                                                              ),
+                                                                              TextButton(
+                                                                                onPressed: () {
+                                                                                  Provider.of<DeletePatientDataProvider>(context,listen: false).deletePatient(
+                                                                                      searchByName.searchByNameModel.data![index].sId!
+                                                                                  ).then((value) {
+                                                                                    Navigator.pushReplacement(
+                                                                                      context,
+                                                                                      MaterialPageRoute(builder: (context) => HomeScreen(lastName: widget.lastName,firstName: widget.firstName,)),
+                                                                                    );
+                                                                                  }
+                                                                                  );
+                                                                                },
+                                                                                child:  Text('Yes',
+                                                                                    style: AppUtils.instance.textStyle(
+                                                                                        fontWeight: FontWeight.bold,
+                                                                                        fontSize: 18,
+                                                                                        color: AppColors.red
+                                                                                    )
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+
+                                                                        ],
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                  child: Container(
+                                                                    height: 40,
+                                                                    width: 40,
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius: BorderRadius.circular(10),
+                                                                        color: AppColors.buttonColor
+                                                                    ),
+                                                                    child: const Icon(Icons.delete,
+                                                                      color: AppColors.white,
+                                                                      size: 20,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(height: 10),
                                                             InkWell(
                                                               onTap: (){
                                                                 Navigator.push(context,
-                                                                    MaterialPageRoute(builder: (builder) =>
-                                                                    const EditPatientDetails()
-                                                                    )
-                                                                );
-                                                              },
-                                                              child: Container(
-                                                                height: 40,
-                                                                width: 40,
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius: BorderRadius.circular(10),
-                                                                    color: AppColors.buttonColor
-                                                                ),
-                                                                child: const Icon(Icons.edit,
-                                                                  color: AppColors.white,
-                                                                  size: 20,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(width: 10),
-                                                            InkWell(
-                                                              onTap: (){
-                                                                showDialog<String>(
-                                                                  context: context,
-                                                                  builder: (BuildContext context) => AlertDialog(
-                                                                    title: const Center(child: Text('Are you sure you want to delete patient record?')),
-                                                                    actions: <Widget>[
-                                                                      Row(
-                                                                        mainAxisAlignment : MainAxisAlignment.center,
-                                                                        children: [
-                                                                          TextButton(
-                                                                            onPressed: () => Navigator.pop(context, 'Cancel'),
-                                                                            child: Text('Cancel',
-                                                                                style: AppUtils.instance.textStyle(
-                                                                                    fontWeight: FontWeight.bold,
-                                                                                    fontSize: 18,
-                                                                                    color: AppColors.green
-                                                                                )
-                                                                            ),
-                                                                          ),
-                                                                          TextButton(
-                                                                            onPressed: () => Navigator.pop(context, 'OK'),
-                                                                            child:  Text('Yes',
-                                                                                style: AppUtils.instance.textStyle(
-                                                                                    fontWeight: FontWeight.bold,
-                                                                                    fontSize: 18,
-                                                                                    color: AppColors.red
-                                                                                )
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
+                                                                    MaterialPageRoute(builder: (builder)=>
+                                                                        AllClinicalTestScreen(
 
-                                                                    ],
-                                                                  ),
+                                                                          firstName: searchByName.searchByNameModel.data![index].firstName!,
+                                                                          lastName: searchByName.searchByNameModel.data![index].lastName!,
+                                                                          address: searchByName.searchByNameModel.data![index].address!,
+                                                                          emailId: searchByName.searchByNameModel.data![index].email!,
+                                                                          phoneNumber: searchByName.searchByNameModel.data![index].phoneNumber!,
+                                                                          height: searchByName.searchByNameModel.data![index].height!,
+                                                                          weight: searchByName.searchByNameModel.data![index].weight!,
+                                                                          patientId: searchByName.searchByNameModel.data![index].sId!,
+
+                                                                        )
+                                                                    )
+
                                                                 );
                                                               },
                                                               child: Container(
+                                                                padding: EdgeInsets.only(left: 10,right: 10),
                                                                 height: 40,
-                                                                width: 40,
                                                                 decoration: BoxDecoration(
                                                                     borderRadius: BorderRadius.circular(10),
                                                                     color: AppColors.buttonColor
                                                                 ),
-                                                                child: const Icon(Icons.delete,
-                                                                  color: AppColors.white,
-                                                                  size: 20,
+                                                                child: Center(
+                                                                  child: Text("View Details",
+                                                                    style: AppUtils.instance.textStyle(
+                                                                        color: AppColors.white
+                                                                    ),
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ),
                                                           ],
                                                         ),
-                                                        const SizedBox(height: 10),
-                                                        InkWell(
-                                                          onTap: (){
-                                                            Navigator.push(context,
-                                                                MaterialPageRoute(builder: (builder)=>
-                                                                AllClinicalTestScreen()
-                                                                )
 
-                                                            );
-                                                          },
-                                                          child: Container(
-                                                            padding: EdgeInsets.only(left: 10,right: 10),
-                                                            height: 40,
-                                                            decoration: BoxDecoration(
-                                                                borderRadius: BorderRadius.circular(10),
-                                                                color: AppColors.buttonColor
-                                                            ),
-                                                            child: Center(
-                                                              child: Text("View Details",
-                                                                style: AppUtils.instance.textStyle(
-                                                                  color: AppColors.white
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
+
                                                       ],
                                                     ),
-
-
                                                   ],
                                                 ),
-                                              ],
+                                              ),
                                             ),
                                           ),
-                                        ),
+
+                                        ],
                                       ),
+                                    );
 
-                                    ],
-                                  ),
-                                );
+                                  })
+                                  :
+                              const Center(child: CircularProgressIndicator()
+                              )
+                          )
+                              :
 
-                              }),
+                          Consumer<GetAllPatientProvider>(
+                              builder: (_, getAllPatientDetails, child) =>
+                              getAllPatientDetails.isLoading  == false ?
+
+                                    ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount:
+                                        getAllPatientDetails.allPatientDetailsModel.data!.length
+                                        ,
+                                        itemBuilder: (context,index){
+                                          return Padding(
+                                            padding: const EdgeInsets.only(left: 15,right: 15,bottom: 10),
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                  width:MediaQuery.of(context).size.width,
+                                                  child: Card(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.all(10),
+                                                      child: Column(
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Flexible(
+                                                                fit:FlexFit.tight,
+                                                                child: Column(
+                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                  children: [
+                                                                    Text("${
+                                                                        getAllPatientDetails.allPatientDetailsModel.data![index].firstName!} "
+                                                                        "${getAllPatientDetails.allPatientDetailsModel.data![index].lastName!}",
+                                                                      style: AppUtils.instance.textStyle(
+                                                                        fontSize: 26,
+                                                                        fontWeight: FontWeight.bold
+                                                                      )
+                                                                    ),
+                                                                    const SizedBox(height: 5),
+                                                                    Text("Email id:- ${getAllPatientDetails.allPatientDetailsModel.data![index].email!}",
+                                                                      style: AppUtils.instance.textStyle(
+                                                                          fontSize: 16,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(height: 5),
+                                                                    // Text("Patient Status:- ${homeScreenData[index].status!}",
+                                                                    //   style: AppUtils.instance.textStyle(
+                                                                    //     fontSize: 16,
+                                                                    //     color: homeScreenData[index].status! == "Critical" ? AppColors.red : AppColors.green
+                                                                    //   ),
+                                                                    // )
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                              const SizedBox(width: 10),
+                                                              Column(
+                                                                children: [
+                                                                  Row(
+                                                                    children: [
+                                                                      InkWell(
+                                                                        onTap: (){
+                                                                          Navigator.push(context,
+                                                                              MaterialPageRoute(builder: (builder) =>
+                                                                                  EditPatientDetails(
+                                                                                    patientId: getAllPatientDetails.allPatientDetailsModel.data![index].sId,
+                                                                                    firstName: getAllPatientDetails.allPatientDetailsModel.data![index].firstName!,
+                                                                                    lastName: getAllPatientDetails.allPatientDetailsModel.data![index].lastName!,
+                                                                                    address: getAllPatientDetails.allPatientDetailsModel.data![index].address!,
+                                                                                    emailId: getAllPatientDetails.allPatientDetailsModel.data![index].email!,
+                                                                                    phoneNumber: getAllPatientDetails.allPatientDetailsModel.data![index].phoneNumber!,
+                                                                                    height: getAllPatientDetails.allPatientDetailsModel.data![index].height!,
+                                                                                    weight: getAllPatientDetails.allPatientDetailsModel.data![index].weight!,
+                                                                                    gender: getAllPatientDetails.allPatientDetailsModel.data![index].gender!,
+
+                                                                                  )
+                                                                              )
+                                                                          );
+                                                                        },
+                                                                        child: Container(
+                                                                          height: 40,
+                                                                          width: 40,
+                                                                          decoration: BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(10),
+                                                                              color: AppColors.buttonColor
+                                                                          ),
+                                                                          child: const Icon(Icons.edit,
+                                                                            color: AppColors.white,
+                                                                            size: 20,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(width: 10),
+                                                                      InkWell(
+                                                                        onTap: (){
+                                                                          showDialog<String>(
+                                                                            context: context,
+                                                                            builder: (BuildContext context) => AlertDialog(
+                                                                              title: const Center(child: Text('Are you sure you want to delete patient record?')),
+                                                                              actions: <Widget>[
+                                                                                Row(
+                                                                                  mainAxisAlignment : MainAxisAlignment.center,
+                                                                                  children: [
+                                                                                    TextButton(
+                                                                                      onPressed: () => Navigator.pop(context, 'Cancel'),
+                                                                                      child: Text('Cancel',
+                                                                                          style: AppUtils.instance.textStyle(
+                                                                                              fontWeight: FontWeight.bold,
+                                                                                              fontSize: 18,
+                                                                                              color: AppColors.green
+                                                                                          )
+                                                                                      ),
+                                                                                    ),
+                                                                                    TextButton(
+                                                                                      onPressed: () {
+                                                                                        Provider.of<DeletePatientDataProvider>(context,listen: false).deletePatient(
+                                                                                            getAllPatientDetails.allPatientDetailsModel.data![index].sId!
+                                                                                        ).then((value) {
+                                                                                          Navigator.pushReplacement(
+                                                                                            context,
+                                                                                            MaterialPageRoute(builder: (context) => HomeScreen(lastName: widget.lastName,firstName: widget.firstName,)),
+                                                                                          );
+                                                                                        }
+                                                                                        );
+                                                                                      },
+                                                                                      child:  Text('Yes',
+                                                                                          style: AppUtils.instance.textStyle(
+                                                                                              fontWeight: FontWeight.bold,
+                                                                                              fontSize: 18,
+                                                                                              color: AppColors.red
+                                                                                          )
+                                                                                      ),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+
+                                                                              ],
+                                                                            ),
+                                                                          );
+                                                                        },
+                                                                        child: Container(
+                                                                          height: 40,
+                                                                          width: 40,
+                                                                          decoration: BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(10),
+                                                                              color: AppColors.buttonColor
+                                                                          ),
+                                                                          child: const Icon(Icons.delete,
+                                                                            color: AppColors.white,
+                                                                            size: 20,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  const SizedBox(height: 10),
+                                                                  InkWell(
+                                                                    onTap: (){
+                                                                      Navigator.push(context,
+                                                                          MaterialPageRoute(builder: (builder)=>
+                                                                          AllClinicalTestScreen(
+
+                                                                            firstName: getAllPatientDetails.allPatientDetailsModel.data![index].firstName!,
+                                                                            lastName: getAllPatientDetails.allPatientDetailsModel.data![index].lastName!,
+                                                                            address: getAllPatientDetails.allPatientDetailsModel.data![index].address!,
+                                                                            emailId: getAllPatientDetails.allPatientDetailsModel.data![index].email!,
+                                                                            phoneNumber: getAllPatientDetails.allPatientDetailsModel.data![index].phoneNumber!,
+                                                                            height: getAllPatientDetails.allPatientDetailsModel.data![index].height!,
+                                                                            weight: getAllPatientDetails.allPatientDetailsModel.data![index].weight!,
+                                                                            patientId: getAllPatientDetails.allPatientDetailsModel.data![index].sId!,
+
+                                                                          )
+                                                                          )
+
+                                                                      );
+                                                                    },
+                                                                    child: Container(
+                                                                      padding: EdgeInsets.only(left: 10,right: 10),
+                                                                      height: 40,
+                                                                      decoration: BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(10),
+                                                                          color: AppColors.buttonColor
+                                                                      ),
+                                                                      child: Center(
+                                                                        child: Text("View Details",
+                                                                          style: AppUtils.instance.textStyle(
+                                                                            color: AppColors.white
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+
+
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+
+                                              ],
+                                            ),
+                                          );
+
+                                        })
+                                  :
+                              const Center(child: CircularProgressIndicator()
+                              )
+                          )
                         ]),
                   )),
             ),

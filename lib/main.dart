@@ -2,12 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mapd722_group1/HomeScreen/Provider/delete_patient_data_provider.dart';
 import 'package:mapd722_group1/utils/app_color.dart';
 import 'package:provider/provider.dart';
 
 import 'AddPatient/Provider/add_patient_provider.dart';
+import 'EditPatient/Provider/edit_patient_provider.dart';
 import 'EditProfile/Provider/update_profile_provider.dart';
 import 'EditProfile/Provider/user_profile_provider.dart';
+import 'HomeScreen/Provider/get_all_patient_provider.dart';
+import 'HomeScreen/Provider/search_by_name_provider.dart';
 import 'Login/Provider/LoginProvider.dart';
 import 'Registration/Provider/registration_provider.dart';
 import 'Splash/SpalshScreen.dart';
@@ -44,7 +48,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<RegistrationProvider>(create: (context) => RegistrationProvider()),
         ChangeNotifierProvider<UserProfileProvider>(create: (context) => UserProfileProvider()),
         ChangeNotifierProvider<UpdateProfileProvider>(create: (context) => UpdateProfileProvider()),
+
         ChangeNotifierProvider<AddPatientProvider>(create: (context) => AddPatientProvider()),
+        ChangeNotifierProvider<GetAllPatientProvider>(create: (context) => GetAllPatientProvider()),
+        ChangeNotifierProvider<DeletePatientDataProvider>(create: (context) => DeletePatientDataProvider()),
+        ChangeNotifierProvider<EditPatientProvider>(create: (context) => EditPatientProvider()),
+
+        ChangeNotifierProvider<SearchByNameProvider>(create: (context) => SearchByNameProvider()),
 
       ],
       child: MaterialApp(

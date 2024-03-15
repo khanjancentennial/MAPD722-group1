@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../Widgets/button_with_text.dart';
 import '../utils/app_color.dart';
 import '../utils/app_utils.dart';
+import '../utils/preference_key.dart';
 
 class AddPatientScreen extends StatefulWidget {
   const AddPatientScreen({super.key});
@@ -34,6 +35,24 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
   String emailValue = "";
 
   bool isFirstTime = false;
+
+  String userFirstName = '';
+  String userLastName = '';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) => getDetails());
+  }
+
+  Future<void>? getDetails() async {
+    if (this.mounted) {
+      userFirstName = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefFirstName);
+      userLastName = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefLastName);
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -486,7 +505,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
 
                             buttonWithText(
                                 onPress: () {
-                                  // validations();
+                                  validations();
                                 },
                                 bgColor: AppColors.buttonColor,
                                 height: 60,
@@ -508,5 +527,65 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
             )
         )
     );
+  }
+  void validations() async {
+
+    if(Provider.of<AddPatientProvider>(context,listen: false).isMale ||
+        Provider.of<AddPatientProvider>(context,listen: false).isFemale
+    ){
+      isFirstTime = false;
+      setState(() {
+
+      });
+    }else{
+      isFirstTime = true;
+      setState(() {
+
+      });
+    }
+
+
+    if(_formKey.currentState!.validate()){
+
+      if((Provider.of<AddPatientProvider>(context,listen: false).isMale ||
+          Provider.of<AddPatientProvider>(context,listen: false).isFemale) ){
+
+        Provider.of<AddPatientProvider>(context, listen: false).addPatient(
+            context,
+            firstName.text,
+            lastName.text,
+            emailController.text,
+            phoneController.text,
+            weightController.text,
+            heightController.text,
+            addressController.text,
+            Provider.of<AddPatientProvider>(context,listen: false).isMale ? "0" : "1",
+          userFirstName.toString(),
+          userLastName.toString()
+
+        );
+
+      }else{}
+
+      //     .then((value) {
+      //
+      //   if (value!.success == true){
+      //
+      //     AppUtils.instance.showToast(
+      //         textColor: Colors.white,
+      //         backgroundColor: Colors.green,
+      //         toastMessage: "${value.message}");
+      //     Navigator.pop(context);
+      //
+      //   } else {
+      //     AppUtils.instance.showToast(
+      //         textColor: Colors.white,
+      //         backgroundColor: AppColors.red,
+      //         toastMessage: "${value.message}");
+      //   }
+      // });
+
+
+    }
   }
 }

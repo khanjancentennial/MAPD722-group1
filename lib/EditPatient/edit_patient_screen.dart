@@ -1,13 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mapd722_group1/AddPatient/Provider/add_patient_provider.dart';
+import 'package:mapd722_group1/EditPatient/Provider/edit_patient_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../Widgets/button_with_text.dart';
 import '../utils/app_color.dart';
 import '../utils/app_utils.dart';
 class EditPatientDetails extends StatefulWidget {
-  const EditPatientDetails({super.key});
+
+  String? patientId;
+  String? firstName;
+  String? lastName;
+  String? emailId;
+  String? phoneNumber;
+  String? height;
+  String? weight;
+  String? address;
+  int? gender;
+
+  EditPatientDetails({super.key,this.patientId,this.firstName,this.lastName,this.address,this.height,this.weight,this.emailId,this.phoneNumber,this.gender});
 
   @override
   State<EditPatientDetails> createState() => _EditPatientDetailsState();
@@ -34,6 +46,34 @@ class _EditPatientDetailsState extends State<EditPatientDetails> {
   String emailValue = "";
 
   bool isFirstTime = false;
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) => getDetails());
+  }
+
+  Future<void>? getDetails() async {
+    if (this.mounted) {
+      firstName.text = widget.firstName.toString();
+      lastName.text = widget.lastName.toString();
+      emailController.text = widget.emailId.toString();
+      phoneController.text = widget.phoneNumber.toString();
+      weightController.text = widget.weight.toString();
+      heightController.text = widget.height.toString();
+      addressController.text = widget.address.toString();
+
+      widget.gender == 0 ?
+
+          Provider.of<EditPatientProvider>(context,listen: false).isMale = true
+          :
+      Provider.of<EditPatientProvider>(context,listen: false).isFemale = true;
+      setState(() {});
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +206,7 @@ class _EditPatientDetailsState extends State<EditPatientDetails> {
                         const SizedBox(height: 5),
                         //email
                         TextFormField(
+                          enabled: false,
                           onTap: () {},
                           controller: emailController,
                           focusNode: emailFocusNode,
@@ -189,23 +230,23 @@ class _EditPatientDetailsState extends State<EditPatientDetails> {
                             // ),
 
                           ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return "Please enter email";
-                            }
-                            else {
-                              if(Provider.of<AddPatientProvider>(context,listen: false).emailStructure(value)){
-                                return null;
-                              }else{
-                                return "Please enter a valid email address";
-                              }
-
-                            }
-                          },
-                          onChanged: (emailValue){
-                            Provider.of<AddPatientProvider>(context,listen: false).emailStructure(emailValue);
-                            // print(emailValue);
-                          },
+                          // validator: (value) {
+                          //   if (value!.isEmpty) {
+                          //     return "Please enter email";
+                          //   }
+                          //   else {
+                          //     if(Provider.of<AddPatientProvider>(context,listen: false).emailStructure(value)){
+                          //       return null;
+                          //     }else{
+                          //       return "Please enter a valid email address";
+                          //     }
+                          //
+                          //   }
+                          // },
+                          // onChanged: (emailValue){
+                          //   Provider.of<AddPatientProvider>(context,listen: false).emailStructure(emailValue);
+                          //   // print(emailValue);
+                          // },
                         ),
                         const SizedBox(height: 20),
 
@@ -383,7 +424,7 @@ class _EditPatientDetailsState extends State<EditPatientDetails> {
                             )),
                         const SizedBox(height: 10),
 
-                        Consumer<AddPatientProvider>(
+                        Consumer<EditPatientProvider>(
                           builder: (_, gender, child) => Row(
                             children: [
                               InkWell(
@@ -454,10 +495,10 @@ class _EditPatientDetailsState extends State<EditPatientDetails> {
                           ),
                         ),
 
-                        isFirstTime?
-                        Consumer<AddPatientProvider>(
+                        isFirstTime ?
+                        Consumer<EditPatientProvider>(
                             builder: (_, gender, child) =>
-                            gender.isMale == false || gender.isFemale == false ?
+                            gender.isMale == false && gender.isFemale == false ?
 
                             Padding(
                               padding: const EdgeInsets.only(top: 10,left: 13),
@@ -470,9 +511,7 @@ class _EditPatientDetailsState extends State<EditPatientDetails> {
                                 :
                             const SizedBox()
                         )
-                            :
-                        const SizedBox(),
-
+                        :const SizedBox(),
 
                         const SizedBox(height: 40),
 
@@ -497,7 +536,7 @@ class _EditPatientDetailsState extends State<EditPatientDetails> {
 
                         buttonWithText(
                             onPress: () {
-                              // validations();
+                              validations();
                             },
                             bgColor: AppColors.buttonColor,
                             height: 60,
@@ -519,5 +558,56 @@ class _EditPatientDetailsState extends State<EditPatientDetails> {
             )
         )
     );
+  }
+  void validations() async {
+
+    isFirstTime = true;
+    setState(() {
+
+    });
+
+    if(_formKey.currentState!.validate()){
+
+      if((Provider.of<EditPatientProvider>(context,listen: false).isMale ||
+          Provider.of<EditPatientProvider>(context,listen: false).isFemale)
+          ){
+
+        Provider.of<EditPatientProvider>(context, listen: false).editPatient(
+            context,
+            firstName.text.toString(),
+            lastName.text.toString(),
+            emailController.text.toString(),
+            phoneController.text.toString(),
+            heightController.text.toString(),
+            weightController.text.toString(),
+            addressController.text.toString(),
+            Provider.of<EditPatientProvider>(context,listen: false).isMale ? "0" : "1",
+            widget.patientId!
+
+        );
+
+      }else{}
+
+
+      //     .then((value) {
+      //
+      //   if (value!.success == true){
+      //
+      //     AppUtils.instance.showToast(
+      //         textColor: Colors.white,
+      //         backgroundColor: Colors.green,
+      //         toastMessage: "${value.message}");
+      //     Navigator.pop(context);
+      //
+      //   } else {
+      //     AppUtils.instance.showToast(
+      //         textColor: Colors.white,
+      //         backgroundColor: AppColors.red,
+      //         toastMessage: "${value.message}");
+      //   }
+      // });
+
+
+    }
   }
 }
