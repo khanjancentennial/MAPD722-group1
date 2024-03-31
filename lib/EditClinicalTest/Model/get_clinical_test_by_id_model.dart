@@ -1,24 +1,19 @@
-class AllClinicalTest {
+class GetClinicalTestByIdModel {
   bool? success;
-  List<Data>? data;
+  Data? data;
 
-  AllClinicalTest({this.success, this.data});
+  GetClinicalTestByIdModel({this.success, this.data});
 
-  AllClinicalTest.fromJson(Map<String, dynamic> json) {
+  GetClinicalTestByIdModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
-    if (json['data'] != null) {
-      data = <Data>[];
-      json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
-      });
-    }
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['success'] = this.success;
     if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
@@ -37,7 +32,6 @@ class Data {
   String? medicalPrescription;
   String? creationDateTime;
   int? iV;
-  bool isExpanded = false;
 
   Data(
       {this.patient,
@@ -51,9 +45,7 @@ class Data {
         this.medicalDiagnosis,
         this.medicalPrescription,
         this.creationDateTime,
-        this.iV,
-        this.isExpanded = false
-      });
+        this.iV});
 
   Data.fromJson(Map<String, dynamic> json) {
     patient =

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mapd722_group1/EditPatient/edit_patient_screen.dart';
+import 'package:mapd722_group1/HomeScreen/Provider/get_all_critical_patient_provider.dart';
 import 'package:mapd722_group1/HomeScreen/Provider/search_by_name_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -37,11 +38,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void>? getDetails() async {
     if (this.mounted) {
-      Provider.of<GetAllPatientProvider>(context, listen: false).getAllPatientDetails();
+      Provider.of<GetAllPatientProvider>(context, listen: false).getAllPatientDetails().then((value) {
+        Provider.of<GetAllCriticalPatientProvider>(context, listen: false).getAllCriticalPatientDetails(context);
+      });
       // Provider.of<SearchByNameProvider>(context,listen: false).getPatientByName("");
       setState(() {});
 
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -226,7 +234,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
 
                                 onChanged: (value){
-                                  Provider.of<SearchByNameProvider>(context,listen: false).getPatientByName(value);
+                                  Provider.of<SearchByNameProvider>(context,listen: false).getPatientByName(value).then((value) {
+                                    Provider.of<GetAllCriticalPatientProvider>(context, listen: false).getAllCriticalPatientDetails(context);
+                                  });
                                   // print(emailValue);
                                 },
                               ),
@@ -235,9 +245,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(height: 30),
 
                           searchController.text.isNotEmpty ?
-                          Consumer<SearchByNameProvider>(
-                              builder: (_, searchByName, child) =>
-                              searchByName.isLoading  == false ?
+                          Consumer2<SearchByNameProvider,GetAllCriticalPatientProvider>(
+                              builder: (_, searchByName,getAllCriticalPatient, child) =>
+                              searchByName.isLoading  == false && getAllCriticalPatient.isLoading == false?
 
                                   searchByName.searchByNameModel.success == false ?
                                       Center(
@@ -291,12 +301,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 ),
                                                               ),
                                                               const SizedBox(height: 5),
-                                                              // Text("Patient Status:- ${homeScreenData[index].status!}",
-                                                              //   style: AppUtils.instance.textStyle(
-                                                              //     fontSize: 16,
-                                                              //     color: homeScreenData[index].status! == "Critical" ? AppColors.red : AppColors.green
-                                                              //   ),
-                                                              // )
+                                                              Text("Patient Status:- ${searchByName.searchByNameModel.data![index].isCritical ? "Critical" : "Normal"}",
+                                                                style: AppUtils.instance.textStyle(
+                                                                  fontSize: 16,
+                                                                  color: searchByName.searchByNameModel.data![index].isCritical ? AppColors.red : AppColors.green
+                                                                ),
+                                                              )
                                                             ],
                                                           ),
                                                         ),
@@ -460,15 +470,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           )
                               :
 
-                          Consumer<GetAllPatientProvider>(
-                              builder: (_, getAllPatientDetails, child) =>
-                              getAllPatientDetails.isLoading  == false ?
+                          Consumer2<GetAllPatientProvider,GetAllCriticalPatientProvider>(
+                              builder: (_, getAllPatientDetails,getAllCriticalPatientProvider, __) =>
+                              getAllPatientDetails.isLoading  == false && getAllCriticalPatientProvider.isLoading == false?
 
                                     ListView.builder(
                                         shrinkWrap: true,
                                         physics: NeverScrollableScrollPhysics(),
                                         itemCount:
-                                        getAllPatientDetails.allPatientDetailsModel.data!.length
+                                        getAllPatientDetails.allPatientDetailsModel!.data!.length
                                         ,
                                         itemBuilder: (context,index){
                                           return Padding(
@@ -490,26 +500,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                                   children: [
                                                                     Text("${
-                                                                        getAllPatientDetails.allPatientDetailsModel.data![index].firstName!} "
-                                                                        "${getAllPatientDetails.allPatientDetailsModel.data![index].lastName!}",
+                                                                        getAllPatientDetails.allPatientDetailsModel!.data![index].firstName!} "
+                                                                        "${getAllPatientDetails.allPatientDetailsModel!.data![index].lastName!}",
                                                                       style: AppUtils.instance.textStyle(
                                                                         fontSize: 26,
                                                                         fontWeight: FontWeight.bold
                                                                       )
                                                                     ),
                                                                     const SizedBox(height: 5),
-                                                                    Text("Email id:- ${getAllPatientDetails.allPatientDetailsModel.data![index].email!}",
+                                                                    Text("Email id:- ${getAllPatientDetails.allPatientDetailsModel!.data![index].email!}",
                                                                       style: AppUtils.instance.textStyle(
                                                                           fontSize: 16,
                                                                       ),
                                                                     ),
                                                                     const SizedBox(height: 5),
-                                                                    // Text("Patient Status:- ${homeScreenData[index].status!}",
-                                                                    //   style: AppUtils.instance.textStyle(
-                                                                    //     fontSize: 16,
-                                                                    //     color: homeScreenData[index].status! == "Critical" ? AppColors.red : AppColors.green
-                                                                    //   ),
-                                                                    // )
+                                                                    Text("Patient Status:- ${getAllPatientDetails.allPatientDetailsModel!.data![index].isCritical ? "Critical" : "Normal"}",
+                                                                      style: AppUtils.instance.textStyle(
+                                                                        fontSize: 16,
+                                                                        color: getAllPatientDetails.allPatientDetailsModel!.data![index].isCritical ? AppColors.red : AppColors.green
+                                                                      ),
+                                                                    )
                                                                   ],
                                                                 ),
                                                               ),
@@ -523,15 +533,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                           Navigator.push(context,
                                                                               MaterialPageRoute(builder: (builder) =>
                                                                                   EditPatientDetails(
-                                                                                    patientId: getAllPatientDetails.allPatientDetailsModel.data![index].sId,
-                                                                                    firstName: getAllPatientDetails.allPatientDetailsModel.data![index].firstName!,
-                                                                                    lastName: getAllPatientDetails.allPatientDetailsModel.data![index].lastName!,
-                                                                                    address: getAllPatientDetails.allPatientDetailsModel.data![index].address!,
-                                                                                    emailId: getAllPatientDetails.allPatientDetailsModel.data![index].email!,
-                                                                                    phoneNumber: getAllPatientDetails.allPatientDetailsModel.data![index].phoneNumber!,
-                                                                                    height: getAllPatientDetails.allPatientDetailsModel.data![index].height!,
-                                                                                    weight: getAllPatientDetails.allPatientDetailsModel.data![index].weight!,
-                                                                                    gender: getAllPatientDetails.allPatientDetailsModel.data![index].gender!,
+                                                                                    patientId: getAllPatientDetails.allPatientDetailsModel!.data![index].sId,
+                                                                                    firstName: getAllPatientDetails.allPatientDetailsModel!.data![index].firstName!,
+                                                                                    lastName: getAllPatientDetails.allPatientDetailsModel!.data![index].lastName!,
+                                                                                    address: getAllPatientDetails.allPatientDetailsModel!.data![index].address!,
+                                                                                    emailId: getAllPatientDetails.allPatientDetailsModel!.data![index].email!,
+                                                                                    phoneNumber: getAllPatientDetails.allPatientDetailsModel!.data![index].phoneNumber!,
+                                                                                    height: getAllPatientDetails.allPatientDetailsModel!.data![index].height!,
+                                                                                    weight: getAllPatientDetails.allPatientDetailsModel!.data![index].weight!,
+                                                                                    gender: getAllPatientDetails.allPatientDetailsModel!.data![index].gender!,
 
                                                                                   )
                                                                               )
@@ -574,7 +584,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                                     TextButton(
                                                                                       onPressed: () {
                                                                                         Provider.of<DeletePatientDataProvider>(context,listen: false).deletePatient(
-                                                                                            getAllPatientDetails.allPatientDetailsModel.data![index].sId!
+                                                                                            getAllPatientDetails.allPatientDetailsModel!.data![index].sId!
                                                                                         ).then((value) {
                                                                                           Navigator.pushReplacement(
                                                                                             context,
@@ -620,14 +630,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                           MaterialPageRoute(builder: (builder)=>
                                                                           AllClinicalTestScreen(
 
-                                                                            firstName: getAllPatientDetails.allPatientDetailsModel.data![index].firstName!,
-                                                                            lastName: getAllPatientDetails.allPatientDetailsModel.data![index].lastName!,
-                                                                            address: getAllPatientDetails.allPatientDetailsModel.data![index].address!,
-                                                                            emailId: getAllPatientDetails.allPatientDetailsModel.data![index].email!,
-                                                                            phoneNumber: getAllPatientDetails.allPatientDetailsModel.data![index].phoneNumber!,
-                                                                            height: getAllPatientDetails.allPatientDetailsModel.data![index].height!,
-                                                                            weight: getAllPatientDetails.allPatientDetailsModel.data![index].weight!,
-                                                                            patientId: getAllPatientDetails.allPatientDetailsModel.data![index].sId!,
+                                                                            firstName: getAllPatientDetails.allPatientDetailsModel!.data![index].firstName!,
+                                                                            lastName: getAllPatientDetails.allPatientDetailsModel!.data![index].lastName!,
+                                                                            address: getAllPatientDetails.allPatientDetailsModel!.data![index].address!,
+                                                                            emailId: getAllPatientDetails.allPatientDetailsModel!.data![index].email!,
+                                                                            phoneNumber: getAllPatientDetails.allPatientDetailsModel!.data![index].phoneNumber!,
+                                                                            height: getAllPatientDetails.allPatientDetailsModel!.data![index].height!,
+                                                                            weight: getAllPatientDetails.allPatientDetailsModel!.data![index].weight!,
+                                                                            patientId: getAllPatientDetails.allPatientDetailsModel!.data![index].sId!,
 
                                                                           )
                                                                           )

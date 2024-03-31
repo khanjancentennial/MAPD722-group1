@@ -92,6 +92,7 @@ class _EditPatientDetailsState extends State<EditPatientDetails> {
                         InkWell(
                             onTap: (){
                               Navigator.pop(context);
+                              Provider.of<EditPatientProvider>(context,listen: false).falseGender();
                             },
                             child: Container(
                                 height: 50,
@@ -584,7 +585,9 @@ class _EditPatientDetailsState extends State<EditPatientDetails> {
             Provider.of<EditPatientProvider>(context,listen: false).isMale ? "0" : "1",
             widget.patientId!
 
-        );
+        ).then((value) {
+          Provider.of<EditPatientProvider>(context,listen: false).falseGender();
+        });
 
       }else{}
 

@@ -1,12 +1,32 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
+import '../AllTests/all_clinial_test_screen.dart';
 import '../Widgets/button_with_text.dart';
 import '../utils/app_color.dart';
 import '../utils/app_utils.dart';
+import 'Provider/add_clinical_test_provider.dart';
 
 class AddClinicalTestScreen extends StatefulWidget {
-  const AddClinicalTestScreen({super.key});
+  String? patientId;
+  String? firstName;
+  String? lastName;
+  String? address;
+  String? height;
+  String? weight;
+  String? emailId;
+  String? phoneNumber;
+  AddClinicalTestScreen({super.key,
+    this.firstName,
+    this.lastName,
+    this.address,
+    this.height,
+    this.weight,
+    this.emailId,
+    this.phoneNumber,
+    this.patientId});
 
   @override
   State<AddClinicalTestScreen> createState() => _AddClinicalTestScreenState();
@@ -419,7 +439,7 @@ class _AddClinicalTestScreenState extends State<AddClinicalTestScreen> {
 
                         buttonWithText(
                             onPress: () {
-                              // validations();
+                              validations();
                             },
                             bgColor: AppColors.buttonColor,
                             height: 60,
@@ -442,4 +462,75 @@ class _AddClinicalTestScreenState extends State<AddClinicalTestScreen> {
         )
     );
   }
+
+  void validations() async {
+    DateTime now = DateTime.now().toUtc();
+    String formattedDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(now);
+
+    if(_formKey.currentState!.validate()){
+
+
+        Provider.of<AddClinicalTestProvider>(context, listen: false).createNewTest(
+            context,
+            bloodPressure.text,
+            respiratoryRate.text,
+            bloodOxygenLevel.text,
+            heartbeatRate.text,
+            chiefComplaint.text,
+            pastMedicalHistory.text,
+            medicalDiagnosis.text,
+            medicalPrescription.text,
+            formattedDate,
+          widget.patientId!,
+          widget.firstName!,
+          widget.lastName!,
+          widget.address!,
+          widget.height!,
+          widget.weight!,
+          widget.emailId!,
+          widget.phoneNumber!,
+        ).then((value) {
+          Navigator.pop(context);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) =>  AllClinicalTestScreen(
+              firstName : widget.firstName,
+              lastName : widget.lastName,
+              address : widget.address,
+              height : widget.height,
+              weight : widget.weight,
+              emailId :widget.emailId,
+              phoneNumber : widget.phoneNumber,
+              patientId: widget.patientId,
+
+            )
+            ),
+          );
+        });
+
+
+
+
+      //     .then((value) {
+      //
+      //   if (value!.success == true){
+      //
+      //     AppUtils.instance.showToast(
+      //         textColor: Colors.white,
+      //         backgroundColor: Colors.green,
+      //         toastMessage: "${value.message}");
+      //     Navigator.pop(context);
+      //
+      //   } else {
+      //     AppUtils.instance.showToast(
+      //         textColor: Colors.white,
+      //         backgroundColor: AppColors.red,
+      //         toastMessage: "${value.message}");
+      //   }
+      // });
+
+
+    }
+  }
+
 }

@@ -3,46 +3,32 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mapd722_group1/AllTests/Model/clinical_test_model.dart';
 
 import 'dart:async';
 
-
-
-import '../../HomeScreen/home_screen.dart';
-import '../../Login/Model/login_model.dart';
 import '../../utils/api_network.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/exceptions.dart';
-import '../../utils/preference_key.dart';
+import '../Model/delete_clinical_test_by_id_model.dart';
 
-class AllClinicalTestProvider extends ChangeNotifier {
-  AllClinicalTest? allClinicalTest;
-  List<Data?> allClinicalTestList = [];
+class DeleteClinicalTestByIdProvider extends ChangeNotifier {
+  DeleteClinicalTestByIdModel? deleteClinicalTestByIdModel;
   bool isLoading=false;
 
 
-  Future<AllClinicalTest?> allClinicalTestMethod(BuildContext context,String userId) async {
+  Future<DeleteClinicalTestByIdModel?> delete(BuildContext context,String testId) async {
 
     startLoading();
 
     try {
       http.Response response =
-      await http.get(Uri.parse(ApiNetwork.GET_ALL_CLINICAL_TEST),
-          );
+      await http.delete(Uri.parse("${ApiNetwork.GET_ALL_CLINICAL_TEST}/$testId"),
+      );
       if (response.statusCode == 200) {
-        allClinicalTest = AllClinicalTest.fromJson(json.decode(response.body));
+        deleteClinicalTestByIdModel = DeleteClinicalTestByIdModel.fromJson(json.decode(response.body));
 
-        if(allClinicalTest!.success == true){
-          allClinicalTestList = [];
-          allClinicalTest!.data!.asMap().forEach((key, value) {
-            if(value.patient!.sId.toString() == userId.toString()){
-              allClinicalTestList.add(value);
-              notifyListeners();
-            }
-          }
-          );
+        if(deleteClinicalTestByIdModel!.success == true){
 
           stopLoading();
           // AppUtils.instance.showToast(
@@ -90,7 +76,7 @@ class AllClinicalTestProvider extends ChangeNotifier {
       print(e.toString());
     }
     notifyListeners();
-    return allClinicalTest;
+    return deleteClinicalTestByIdModel;
   }
 
   void startLoading(){
@@ -101,11 +87,6 @@ class AllClinicalTestProvider extends ChangeNotifier {
     isLoading=false;
     notifyListeners();
   }
-
-
-hideShow(index){
-  allClinicalTest!.data![index].isExpanded = !allClinicalTest!.data![index].isExpanded;
-}
 
 
 }

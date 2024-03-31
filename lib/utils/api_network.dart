@@ -13,5 +13,10 @@ class ApiNetwork{
 
   static const SEARCH_BY_NAME = "$BASE_URL/patient/viewByName";
 
+  static const GET_ALL_CLINICAL_TEST = "$BASE_URL/api/clinical-tests/clinical-tests";
+  static const GET_ALL_CLINICAL_TEST_BY_ID = "$BASE_URL/api/clinical-tests/clinical-testsById";
+
+  static const GET_ALL_CRITICAL_TEST = "$BASE_URL/api/clinical-tests/critical-patients";
+
 
 }

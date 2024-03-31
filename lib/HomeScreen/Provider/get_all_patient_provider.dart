@@ -14,7 +14,7 @@ import '../../utils/exceptions.dart';
 import '../Model/home_screen_model.dart';
 
 class GetAllPatientProvider extends ChangeNotifier {
-  late AllPatientDetailsModel allPatientDetailsModel;
+  AllPatientDetailsModel? allPatientDetailsModel;
   bool isLoading=false;
 
 
@@ -32,7 +32,7 @@ class GetAllPatientProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         allPatientDetailsModel = AllPatientDetailsModel.fromJson(json.decode(response.body));
 
-        if(allPatientDetailsModel.success== true){
+        if(allPatientDetailsModel!.success== true){
 
           // AppUtils.instance.showToast(
           //     textColor: Colors.white,

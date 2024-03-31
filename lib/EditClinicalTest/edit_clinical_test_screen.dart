@@ -1,12 +1,35 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:mapd722_group1/EditClinicalTest/Provider/edit_clinical_test_provider.dart';
+import 'package:mapd722_group1/EditClinicalTest/Provider/get_clinical_test_by_id_provider.dart';
+import 'package:provider/provider.dart';
 
+import '../AllTests/all_clinial_test_screen.dart';
 import '../Widgets/button_with_text.dart';
 import '../utils/app_color.dart';
 import '../utils/app_utils.dart';
 
 class EditClinicalTest extends StatefulWidget {
-  const EditClinicalTest({super.key});
+  String? patientId;
+  String? firstName;
+  String? lastName;
+  String? address;
+  String? height;
+  String? weight;
+  String? emailId;
+  String? phoneNumber;
+  String? testId;
+  EditClinicalTest({super.key,
+    this.firstName,
+    this.lastName,
+    this.address,
+    this.height,
+    this.weight,
+    this.emailId,
+    this.phoneNumber,
+    this.testId,
+    this.patientId});
 
   @override
   State<EditClinicalTest> createState() => _EditClinicalTestState();
@@ -14,14 +37,7 @@ class EditClinicalTest extends StatefulWidget {
 
 class _EditClinicalTestState extends State<EditClinicalTest> {
 
-  TextEditingController bloodPressure = TextEditingController();
-  TextEditingController respiratoryRate = TextEditingController();
-  TextEditingController bloodOxygenLevel = TextEditingController();
-  TextEditingController heartbeatRate = TextEditingController();
-  TextEditingController chiefComplaint = TextEditingController();
-  TextEditingController pastMedicalHistory = TextEditingController();
-  TextEditingController medicalDiagnosis = TextEditingController();
-  TextEditingController medicalPrescription = TextEditingController();
+
   FocusNode bloodPressureFocusNode = FocusNode();
   FocusNode respiratoryRateFocusNode = FocusNode();
   FocusNode bloodOxygenLevelFocusNode = FocusNode();
@@ -34,6 +50,22 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
   String emailValue = "";
 
   bool isFirstTime = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) => getDetails());
+  }
+
+  Future<void>? getDetails() async {
+    if (this.mounted) {
+      Provider.of<GetClinicalTestByIdProvider>(context, listen: false).allClinicalTestMethod(context, widget.testId!);
+      // Provider.of<SearchByNameProvider>(context,listen: false).getPatientByName("");
+      setState(() {});
+
+    }
+  }
 
 
   @override
@@ -91,7 +123,7 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                         // first name
                         TextFormField(
                           onTap: () {},
-                          controller: bloodPressure,
+                          controller: Provider.of<GetClinicalTestByIdProvider>(context,listen: false).bloodPressure,
                           focusNode: bloodPressureFocusNode,
                           decoration: InputDecoration(
                             // contentPadding: const EdgeInsets.only(left: 10),
@@ -131,7 +163,7 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                         // last name
                         TextFormField(
                           onTap: () {},
-                          controller: respiratoryRate,
+                          controller: Provider.of<GetClinicalTestByIdProvider>(context,listen: false).respiratoryRate,
                           focusNode: respiratoryRateFocusNode,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(
@@ -171,7 +203,7 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                         //email
                         TextFormField(
                           onTap: () {},
-                          controller: bloodOxygenLevel,
+                          controller: Provider.of<GetClinicalTestByIdProvider>(context,listen: false).bloodOxygenLevel,
                           focusNode: bloodOxygenLevelFocusNode,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(
@@ -219,7 +251,7 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                         // weight text field
                         TextFormField(
                           onTap: () {},
-                          controller: heartbeatRate,
+                          controller: Provider.of<GetClinicalTestByIdProvider>(context,listen: false).heartbeatRate,
                           focusNode: heartbeatRateFocusNode,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(
@@ -259,7 +291,7 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                         TextFormField(
                           maxLines: 5,
                           onTap: () {},
-                          controller: chiefComplaint,
+                          controller: Provider.of<GetClinicalTestByIdProvider>(context,listen: false).chiefComplaint,
                           focusNode: chiefComplaintFocusNode,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(
@@ -299,7 +331,7 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                         TextFormField(
                           maxLines: 5,
                           onTap: () {},
-                          controller: pastMedicalHistory,
+                          controller: Provider.of<GetClinicalTestByIdProvider>(context,listen: false).pastMedicalHistory,
                           focusNode: pastMedicalHistoryFocusNode,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(
@@ -339,7 +371,7 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                         TextFormField(
                           maxLines: 5,
                           onTap: () {},
-                          controller: medicalDiagnosis,
+                          controller: Provider.of<GetClinicalTestByIdProvider>(context,listen: false).medicalDiagnosis,
                           focusNode: medicalDiagnosisFocusNode,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(
@@ -380,7 +412,7 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                         TextFormField(
                           maxLines: 5,
                           onTap: () {},
-                          controller: medicalPrescription,
+                          controller: Provider.of<GetClinicalTestByIdProvider>(context,listen: false).medicalPrescription,
                           focusNode: medicalPrescriptionFocusNode,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(
@@ -438,7 +470,7 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
 
                         buttonWithText(
                             onPress: () {
-                              // validations();
+                              validations();
                             },
                             bgColor: AppColors.buttonColor,
                             height: 60,
@@ -461,4 +493,75 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
         )
     );
   }
+
+  void validations() async {
+    DateTime now = DateTime.now().toUtc();
+    String formattedDate = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").format(now);
+
+    if(_formKey.currentState!.validate()){
+
+
+      Provider.of<EditClinicalTestProvider>(context, listen: false).createNewTest(
+        context,
+        Provider.of<GetClinicalTestByIdProvider>(context,listen: false).bloodPressure.text,
+        Provider.of<GetClinicalTestByIdProvider>(context,listen: false).respiratoryRate.text,
+        Provider.of<GetClinicalTestByIdProvider>(context,listen: false).bloodOxygenLevel.text,
+        Provider.of<GetClinicalTestByIdProvider>(context,listen: false).heartbeatRate.text,
+        Provider.of<GetClinicalTestByIdProvider>(context,listen: false).chiefComplaint.text,
+        Provider.of<GetClinicalTestByIdProvider>(context,listen: false).pastMedicalHistory.text,
+        Provider.of<GetClinicalTestByIdProvider>(context,listen: false).medicalDiagnosis.text,
+        Provider.of<GetClinicalTestByIdProvider>(context,listen: false).medicalPrescription.text,
+        formattedDate,
+        Provider.of<GetClinicalTestByIdProvider>(context,listen: false).getClinicalTestByIdModel!.data!.sId!,
+        widget.patientId!,
+        widget.firstName!,
+        widget.lastName!,
+        widget.address!,
+        widget.height!,
+        widget.weight!,
+        widget.emailId!,
+        widget.phoneNumber!,
+      ).then((value) {
+        Navigator.pop(context);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) =>  AllClinicalTestScreen(
+            firstName : widget.firstName,
+            lastName : widget.lastName,
+            address : widget.address,
+            height : widget.height,
+            weight : widget.weight,
+            emailId :widget.emailId,
+            phoneNumber : widget.phoneNumber,
+            patientId: widget.patientId,
+
+          )
+          ),
+        );
+      });
+
+
+      //     .then((value) {
+      //
+      //   if (value!.success == true){
+      //
+      //     AppUtils.instance.showToast(
+      //         textColor: Colors.white,
+      //         backgroundColor: Colors.green,
+      //         toastMessage: "${value.message}");
+      //     Navigator.pop(context);
+      //
+      //   } else {
+      //     AppUtils.instance.showToast(
+      //         textColor: Colors.white,
+      //         backgroundColor: AppColors.red,
+      //         toastMessage: "${value.message}");
+      //   }
+      // });
+
+
+    }
+  }
+  
+  
 }

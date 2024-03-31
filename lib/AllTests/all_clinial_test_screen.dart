@@ -1,13 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mapd722_group1/AllTests/Provider/clinical_test_provider.dart';
+import 'package:mapd722_group1/HomeScreen/Provider/get_all_critical_patient_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../AddClinicalTest/add_clinical_test.dart';
 import '../AddPatient/add_patient_screen.dart';
 import '../EditClinicalTest/edit_clinical_test_screen.dart';
 import '../EditPatient/edit_patient_screen.dart';
+import '../HomeScreen/home_screen.dart';
 import '../utils/app_color.dart';
 import '../utils/app_utils.dart';
+import '../utils/preference_key.dart';
 import 'Model/clinical_test_model.dart';
+import 'Provider/delete_clinical_test_by_id_provider.dart';
 
 class AllClinicalTestScreen extends StatefulWidget {
 
@@ -29,12 +35,46 @@ class AllClinicalTestScreen extends StatefulWidget {
 
 class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
 
-  List<ClinicalTestModel> clinicalTest = [
-    ClinicalTestModel("11", "100", "test", "test", "100", "pastHistory", "prescription", "100",false),
-    ClinicalTestModel("11", "100", "test", "test", "100", "pastHistory", "prescription", "100",false),
-    ClinicalTestModel("11", "100", "test", "test", "100", "pastHistory", "prescription", "100",false),
-    ClinicalTestModel("11", "100", "test", "test", "100", "pastHistory", "prescription", "100",false)
-  ];
+  // String userId = '';
+  String status = '';
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) => getDetails());
+  }
+
+  Future<void>? getDetails() async {
+    if (this.mounted) {
+      status = '';
+      // userId = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefUserId);
+
+      Provider.of<AllClinicalTestProvider>(context, listen: false).allClinicalTestMethod(context, widget.patientId!);
+      Provider.of<GetAllCriticalPatientProvider>(context,listen: false).getAllCriticalPatientDetails(context).then((value) {
+        if(Provider.of<GetAllCriticalPatientProvider>(context,listen: false).criticalPatientDetailsModel!.data!.isEmpty){
+          status = "Normal";
+          setState(() {
+          });
+        }
+        for(int i=0; i< Provider.of<GetAllCriticalPatientProvider>(context,listen: false).criticalPatientDetailsModel!.data!.length;i++){
+          if(Provider.of<GetAllCriticalPatientProvider>(context,listen: false).criticalPatientDetailsModel!.data![i].patientInfo!.sId.toString() == widget.patientId){
+            status = "Critical";
+            setState(() {
+            });
+          }else{
+            status = "Normal";
+            setState(() {
+            });
+          }
+        }
+      });
+      // Provider.of<SearchByNameProvider>(context,listen: false).getPatientByName("");
+
+
+      setState(() {});
+
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +92,10 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                     InkWell(
                         onTap: (){
                           Navigator.pop(context);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => HomeScreen(firstName: widget.firstName,lastName: widget.lastName,)),
+                          );
                         },
                         child: Container(
                             height: 50,
@@ -318,7 +362,15 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           onTap: (){
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (builder) =>
-                                const AddClinicalTestScreen()
+                                AddClinicalTestScreen(
+                                  firstName: widget.firstName!,
+                                  lastName: widget.lastName!,
+                                  address: widget.address!,
+                                  height: widget.height!,
+                                  weight: widget.weight!,
+                                  emailId: widget.emailId,
+                                  phoneNumber: widget.phoneNumber,
+                                  patientId: widget.patientId!,)
                                 )
                             );
                           },
@@ -340,373 +392,413 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                   ],
                 ),
 
-                ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: clinicalTest.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding:
-                            const EdgeInsets.only(left: 15, right: 15, bottom: 10),
-                        child: Column(
-                          children: [
-                            Container(
-                              child: Card(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
+                Consumer<AllClinicalTestProvider>(
+                  builder: (_, getClinicalTests, child) =>
+                  getClinicalTests.isLoading?
 
-                // // child: Text(
-                // //       "PO number: ${provider.stowItemDetailModel!.data![index].poNumber} / Line Item No. ${provider.searchPOModel!.data![index].lineItemNo} / ${provider.searchPOModel!.data![index].vendorName}"
-                // //   ),
-                //                               ),
-                //                               SizedBox(
-                //                                 height: 1,
-                //                                 width: MediaQuery.of(context).size.width,
-                //                                 child: Container(
-                //                                   color: AppColors.grey,
-                //                                 ),
-                //                               ),
-                                    Stack(
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.only(
-                                              top: 10, bottom: 10, left: 20),
-                                          child: Row(
+                      Center(child: Container(
+                        child: const CircularProgressIndicator(),
+                      ),)
+                :
+                  Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      Text("Patient Status:- $status",
+                        style: AppUtils.instance.textStyle(
+                            fontSize: 20,
+                            color: status == "Critical"? AppColors.red : AppColors.green
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: getClinicalTests.allClinicalTestList.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding:
+                              const EdgeInsets.only(left: 15, right: 15, bottom: 10),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    child: Card(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+
+                                          Stack(
+                                            clipBehavior: Clip.none,
                                             children: [
-                                              Flexible(
-                                                fit:FlexFit.tight,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                              Container(
+                                                padding: EdgeInsets.only(
+                                                    top: 10, bottom: 10, left: 20),
+                                                child: Row(
                                                   children: [
-                                                    Container(
-                                                      width: MediaQuery.of(context)
-                                                          .size
-                                                          .width,
-                                                      child: Text(
-                                                        "Blood Pressure : ${clinicalTest[index].bloodPressure} ",
-                                                        style: AppUtils.instance
-                                                            .textStyle(
-                                                                fontSize: 13,
-                                                                fontWeight:
-                                                                    FontWeight.bold),
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 5),
-                                                    Container(
-                                                      width: MediaQuery.of(context)
-                                                          .size
-                                                          .width,
-                                                      child: Text(
-                                                        "Heart Rate : ${clinicalTest[index].heartBeat} ",
-                                                        style: AppUtils.instance
-                                                            .textStyle(
-                                                            fontSize: 13,
-                                                            fontWeight:
-                                                            FontWeight.bold),
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 5),
-                                                    Container(
-                                                      width: MediaQuery.of(context)
-                                                          .size
-                                                          .width,
-                                                      child: Text(
-                                                        "respiratoryRate : ${clinicalTest[index].respiratoryRate} ",
-                                                        style: AppUtils.instance
-                                                            .textStyle(
-                                                            fontSize: 13,
-                                                            fontWeight:
-                                                            FontWeight.bold),
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 5),
-                                                    Container(
-                                                      width: MediaQuery.of(context)
-                                                          .size
-                                                          .width,
-                                                      child: Text(
-                                                        "blood Oxygen Level : ${clinicalTest[index].bloodOxygen} ",
-                                                        style: AppUtils.instance
-                                                            .textStyle(
-                                                            fontSize: 13,
-                                                            fontWeight:
-                                                            FontWeight.bold),
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 5),
+                                                    Flexible(
+                                                      fit:FlexFit.tight,
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                        children: [
+                                                          Container(
+                                                            width: MediaQuery.of(context)
+                                                                .size
+                                                                .width,
+                                                            child: Text(
+                                                              "Blood Pressure : ${getClinicalTests.allClinicalTestList[index]!.bloodPressure} ",
+                                                              style: AppUtils.instance
+                                                                  .textStyle(
+                                                                  fontSize: 13,
+                                                                  fontWeight:
+                                                                  FontWeight.bold),
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 5),
+                                                          Container(
+                                                            width: MediaQuery.of(context)
+                                                                .size
+                                                                .width,
+                                                            child: Text(
+                                                              "Heart Rate : ${getClinicalTests.allClinicalTestList[index]!.heartbeatRate} ",
+                                                              style: AppUtils.instance
+                                                                  .textStyle(
+                                                                  fontSize: 13,
+                                                                  fontWeight:
+                                                                  FontWeight.bold),
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 5),
+                                                          Container(
+                                                            width: MediaQuery.of(context)
+                                                                .size
+                                                                .width,
+                                                            child: Text(
+                                                              "respiratoryRate : ${getClinicalTests.allClinicalTestList[index]!.respiratoryRate} ",
+                                                              style: AppUtils.instance
+                                                                  .textStyle(
+                                                                  fontSize: 13,
+                                                                  fontWeight:
+                                                                  FontWeight.bold),
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 5),
+                                                          Container(
+                                                            width: MediaQuery.of(context)
+                                                                .size
+                                                                .width,
+                                                            child: Text(
+                                                              "blood Oxygen Level : ${getClinicalTests.allClinicalTestList[index]!.bloodOxygenLevel} ",
+                                                              style: AppUtils.instance
+                                                                  .textStyle(
+                                                                  fontSize: 13,
+                                                                  fontWeight:
+                                                                  FontWeight.bold),
+                                                            ),
+                                                          ),
+                                                          SizedBox(width: 5),
 
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    InkWell(
+                                                      onTap: (){
+                                                        Navigator.push(context,
+                                                            MaterialPageRoute(builder: (builder) =>
+                                                             EditClinicalTest(
+                                                               firstName: widget.firstName!,
+                                                               lastName: widget.lastName!,
+                                                               address: widget.address!,
+                                                               height: widget.height!,
+                                                               weight: widget.weight!,
+                                                               emailId: widget.emailId,
+                                                               phoneNumber: widget.phoneNumber,
+                                                               patientId: widget.patientId!,
+                                                               testId: getClinicalTests.allClinicalTestList[index]!.sId!,
+                                                             )
+                                                            )
+                                                        );
+                                                      },
+                                                      child: Container(
+                                                        height: 40,
+                                                        width: 40,
+                                                        decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            color: AppColors.buttonColor
+                                                        ),
+                                                        child: const Icon(Icons.edit,
+                                                          color: AppColors.white,
+                                                          size: 20,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 10),
+                                                    InkWell(
+                                                      onTap: (){
+                                                        showDialog<String>(
+                                                          context: context,
+                                                          builder: (BuildContext context) => AlertDialog(
+                                                            title: const Center(child: Text('Are you sure you want to delete patient test?')),
+                                                            actions: <Widget>[
+                                                              Row(
+                                                                mainAxisAlignment : MainAxisAlignment.center,
+                                                                children: [
+                                                                  TextButton(
+                                                                    onPressed: () => Navigator.pop(context, 'Cancel'),
+                                                                    child: Text('Cancel',
+                                                                        style: AppUtils.instance.textStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 18,
+                                                                            color: AppColors.green
+                                                                        )
+                                                                    ),
+                                                                  ),
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      Provider.of<DeleteClinicalTestByIdProvider>(context,listen: false).
+                                                                      delete(context, getClinicalTests.allClinicalTestList[index]!.sId!).then((value) {
+                                                                        Navigator.pop(context);
+                                                                        Navigator.pushReplacement(context,
+                                                                            MaterialPageRoute(builder: (builder) =>
+                                                                                AllClinicalTestScreen(
+                                                                                  firstName: widget.firstName!,
+                                                                                  lastName: widget.lastName!,
+                                                                                  emailId: widget.emailId,
+                                                                                  phoneNumber: widget.phoneNumber,
+                                                                                  height: widget.height,
+                                                                                  weight: widget.weight,
+                                                                                  address: widget.address,
+                                                                                  patientId: widget.patientId,
+
+                                                                                )
+                                                                            )
+                                                                        );
+                                                                      });
+                                                                    },
+                                                                    child:  Text('Yes',
+                                                                        style: AppUtils.instance.textStyle(
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: 18,
+                                                                            color: AppColors.red
+                                                                        )
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: Container(
+                                                        height: 40,
+                                                        width: 40,
+                                                        decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                            color: AppColors.buttonColor
+                                                        ),
+                                                        child: const Icon(Icons.delete,
+                                                          color: AppColors.white,
+                                                          size: 20,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 10),
                                                   ],
                                                 ),
                                               ),
-                                              InkWell(
-                                                onTap: (){
-                                                  Navigator.push(context,
-                                                      MaterialPageRoute(builder: (builder) =>
-                                                      const EditClinicalTest()
-                                                      )
-                                                  );
-                                                },
-                                                child: Container(
-                                                  height: 40,
-                                                  width: 40,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(10),
-                                                      color: AppColors.buttonColor
-                                                  ),
-                                                  child: const Icon(Icons.edit,
-                                                    color: AppColors.white,
-                                                    size: 20,
+                                              Positioned.fill(
+                                                left: -11,
+                                                child: Align(
+                                                  alignment: Alignment.centerLeft,
+                                                  child: InkWell(
+                                                    onDoubleTap: () => null,
+                                                    onTap: () {
+                                                      // Provider.of<StowDetailProvider>(
+                                                      //         context,
+                                                      //         listen: false)
+                                                      //     .hideShowMenu(index);
+                                                      // print(getStowData
+                                                      //     .newStowList[index].isExpanded);
+                                                      getClinicalTests.allClinicalTestList[index]!.isExpanded = !getClinicalTests.allClinicalTestList[index]!.isExpanded;
+                                                      setState(() {});
+                                                    },
+                                                    child: CircleAvatar(
+                                                        radius: 11,
+                                                        backgroundColor:
+                                                        AppColors.buttonColor,
+                                                        child: Center(
+                                                          child:
+                                                          //   Consumer<StowDetailProvider>(
+                                                          // builder: (_, getExpandedData,
+                                                          //         child) =>
+                                                          Icon(
+                                                            getClinicalTests.allClinicalTestList[index]!
+                                                                .isExpanded
+                                                                ? Icons.remove
+                                                                : Icons.add,
+                                                            color: AppColors.white,
+                                                            size: 15,
+                                                          ),
+                                                          // ),
+                                                        )),
                                                   ),
                                                 ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              InkWell(
-                                                onTap: (){
-                                                  showDialog<String>(
-                                                    context: context,
-                                                    builder: (BuildContext context) => AlertDialog(
-                                                      title: const Center(child: Text('Are you sure you want to delete patient test?')),
-                                                      actions: <Widget>[
-                                                        Row(
-                                                          mainAxisAlignment : MainAxisAlignment.center,
-                                                          children: [
-                                                            TextButton(
-                                                              onPressed: () => Navigator.pop(context, 'Cancel'),
-                                                              child: Text('Cancel',
-                                                              style: AppUtils.instance.textStyle(
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: 18,
-                                                                color: AppColors.green
-                                                              )
-                                                              ),
-                                                            ),
-                                                            TextButton(
-                                                              onPressed: () => Navigator.pop(context, 'OK'),
-                                                              child:  Text('Yes',
-                                                                  style: AppUtils.instance.textStyle(
-                                                                      fontWeight: FontWeight.bold,
-                                                                      fontSize: 18,
-                                                                      color: AppColors.red
-                                                                  )
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-
-                                                      ],
+                                              )
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  // Consumer<StowDetailProvider>(
+                                  //     builder: (_, visibleValueGet, child) =>
+                                  Visibility(
+                                    visible: getClinicalTests.allClinicalTestList[index]!.isExpanded ==
+                                        true,
+                                    // visible : true,
+                                    child: Padding(
+                                      padding:
+                                      const EdgeInsets.only(left: 5, right: 5),
+                                      child: Container(
+                                        color: AppColors.white,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(top: 15),
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                padding: EdgeInsets.only(left: 20),
+                                                height: 30,
+                                                child: Align(
+                                                  alignment: Alignment.centerLeft,
+                                                  child: Row(children: [
+                                                    Container(
+                                                      child: Text(
+                                                        "chief Complaint : ",
+                                                        style: AppUtils.instance
+                                                            .textStyle(
+                                                            fontSize: 12),
+                                                      ),
                                                     ),
-                                                  );
-                                                },
-                                                child: Container(
-                                                  height: 40,
-                                                  width: 40,
-                                                  decoration: BoxDecoration(
-                                                      borderRadius: BorderRadius.circular(10),
-                                                      color: AppColors.buttonColor
-                                                  ),
-                                                  child: const Icon(Icons.delete,
-                                                    color: AppColors.white,
-                                                    size: 20,
-                                                  ),
+                                                    Flexible(
+                                                        child: Text(
+                                                          "${getClinicalTests.allClinicalTestList[index]!.chiefComplaint}",
+                                                          style: AppUtils.instance
+                                                              .textStyle(
+                                                              fontWeight:
+                                                              FontWeight.bold,
+                                                              fontSize: 12,
+                                                              color: AppColors
+                                                                  .buttonColor),
+                                                        ))
+                                                  ]),
                                                 ),
                                               ),
-                                              const SizedBox(width: 10),
+                                              Container(
+                                                padding: EdgeInsets.only(left: 20),
+                                                height: 30,
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                color:
+                                                AppColors.dropDownColorExpand,
+                                                child: Align(
+                                                  alignment: Alignment.centerLeft,
+                                                  child: Row(children: [
+                                                    Container(
+                                                      child: Text(
+                                                        "past Medical History : ",
+                                                        style: AppUtils.instance
+                                                            .textStyle(
+                                                            fontSize: 12),
+                                                      ),
+                                                    ),
+                                                    Flexible(
+                                                        child: Text(
+                                                          "${getClinicalTests.allClinicalTestList[index]!.pastMedicalHistory}",
+                                                          style: AppUtils.instance
+                                                              .textStyle(
+                                                              fontWeight:
+                                                              FontWeight.bold,
+                                                              color: AppColors
+                                                                  .buttonColor,
+                                                              fontSize: 12),
+                                                        ))
+                                                  ]),
+                                                ),
+                                              ),
+                                              Container(
+                                                padding: EdgeInsets.only(left: 20),
+                                                height: 30,
+                                                // color: AppColors.dropDownColorExpand,
+                                                child: Align(
+                                                  alignment: Alignment.centerLeft,
+                                                  child: Row(children: [
+                                                    Container(
+                                                      child: Text(
+                                                        "medical Diagnosis : ",
+                                                        style: AppUtils.instance
+                                                            .textStyle(
+                                                            fontSize: 12),
+                                                      ),
+                                                    ),
+                                                    Flexible(
+                                                        child: Text(
+                                                          "${getClinicalTests.allClinicalTestList[index]!.medicalDiagnosis}",
+                                                          style: AppUtils.instance
+                                                              .textStyle(
+                                                              fontWeight:
+                                                              FontWeight.bold,
+                                                              color: AppColors
+                                                                  .buttonColor,
+                                                              fontSize: 12),
+                                                        ))
+                                                  ]),
+                                                ),
+                                              ),
+                                              Container(
+                                                padding: EdgeInsets.only(left: 20),
+                                                height: 30,
+                                                color:
+                                                AppColors.dropDownColorExpand,
+                                                child: Align(
+                                                  alignment: Alignment.centerLeft,
+                                                  child: Row(children: [
+                                                    Container(
+                                                      child: Text(
+                                                        "Prescription : ",
+                                                        style: AppUtils.instance
+                                                            .textStyle(
+                                                            fontSize: 12),
+                                                      ),
+                                                    ),
+                                                    Flexible(
+                                                        child: Text(
+                                                          "${getClinicalTests.allClinicalTestList[index]!.medicalPrescription}",
+                                                          style: AppUtils.instance
+                                                              .textStyle(
+                                                              fontWeight:
+                                                              FontWeight.bold,
+                                                              color: AppColors
+                                                                  .buttonColor,
+                                                              fontSize: 12),
+                                                        ))
+                                                  ]),
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
-                                        Positioned.fill(
-                                          left: -11,
-                                          child: Align(
-                                            alignment: Alignment.centerLeft,
-                                            child: InkWell(
-                                              onDoubleTap: () => null,
-                                              onTap: () {
-                                                // Provider.of<StowDetailProvider>(
-                                                //         context,
-                                                //         listen: false)
-                                                //     .hideShowMenu(index);
-                                                // print(getStowData
-                                                //     .newStowList[index].isExpanded);
-                                                clinicalTest[index].isExpanded = !clinicalTest[index].isExpanded;
-                                                setState(() {});
-                                              },
-                                              child: CircleAvatar(
-                                                  radius: 11,
-                                                  backgroundColor:
-                                                      AppColors.buttonColor,
-                                                  child: Center(
-                                                    child:
-                                                      //   Consumer<StowDetailProvider>(
-                                                      // builder: (_, getExpandedData,
-                                                      //         child) =>
-                                                          Icon(
-                                                        clinicalTest[index]
-                                                                .isExpanded
-                                                            ? Icons.remove
-                                                            : Icons.add,
-                                                        color: AppColors.white,
-                                                        size: 15,
-                                                      ),
-                                                    // ),
-                                                  )),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            // Consumer<StowDetailProvider>(
-                            //     builder: (_, visibleValueGet, child) =>
-                                    Visibility(
-                                      visible: clinicalTest[index].isExpanded ==
-                                          true,
-                // visible : true,
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 5, right: 5),
-                                        child: Container(
-                                          color: AppColors.white,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(top: 15),
-                                            child: Column(
-                                              children: [
-                                                Container(
-                                                  padding: EdgeInsets.only(left: 20),
-                                                  height: 30,
-                                                  child: Align(
-                                                    alignment: Alignment.centerLeft,
-                                                    child: Row(children: [
-                                                      Container(
-                                                        child: Text(
-                                                          "chief Complaint : ",
-                                                          style: AppUtils.instance
-                                                              .textStyle(
-                                                                  fontSize: 12),
-                                                        ),
-                                                      ),
-                                                      Flexible(
-                                                          child: Text(
-                                                        "${clinicalTest[index].chiefComplaint}",
-                                                        style: AppUtils.instance
-                                                            .textStyle(
-                                                                fontWeight:
-                                                                    FontWeight.bold,
-                                                                fontSize: 12,
-                                                                color: AppColors
-                                                                    .buttonColor),
-                                                      ))
-                                                    ]),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  padding: EdgeInsets.only(left: 20),
-                                                  height: 30,
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  color:
-                                                      AppColors.dropDownColorExpand,
-                                                  child: Align(
-                                                    alignment: Alignment.centerLeft,
-                                                    child: Row(children: [
-                                                      Container(
-                                                        child: Text(
-                                                          "past Medical History : ",
-                                                          style: AppUtils.instance
-                                                              .textStyle(
-                                                                  fontSize: 12),
-                                                        ),
-                                                      ),
-                                                      Flexible(
-                                                          child: Text(
-                                                        "${clinicalTest[index].pastHistory}",
-                                                        style: AppUtils.instance
-                                                            .textStyle(
-                                                                fontWeight:
-                                                                    FontWeight.bold,
-                                                                color: AppColors
-                                                                    .buttonColor,
-                                                                fontSize: 12),
-                                                      ))
-                                                    ]),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  padding: EdgeInsets.only(left: 20),
-                                                  height: 30,
-                // color: AppColors.dropDownColorExpand,
-                                                  child: Align(
-                                                    alignment: Alignment.centerLeft,
-                                                    child: Row(children: [
-                                                      Container(
-                                                        child: Text(
-                                                          "medical Diagnosis : ",
-                                                          style: AppUtils.instance
-                                                              .textStyle(
-                                                                  fontSize: 12),
-                                                        ),
-                                                      ),
-                                                      Flexible(
-                                                          child: Text(
-                                                        "${clinicalTest[index].diagnosis}",
-                                                        style: AppUtils.instance
-                                                            .textStyle(
-                                                                fontWeight:
-                                                                    FontWeight.bold,
-                                                                color: AppColors
-                                                                    .buttonColor,
-                                                                fontSize: 12),
-                                                      ))
-                                                    ]),
-                                                  ),
-                                                ),
-                                                Container(
-                                                  padding: EdgeInsets.only(left: 20),
-                                                  height: 30,
-                                                  color:
-                                                      AppColors.dropDownColorExpand,
-                                                  child: Align(
-                                                    alignment: Alignment.centerLeft,
-                                                    child: Row(children: [
-                                                      Container(
-                                                        child: Text(
-                                                          "Prescription : ",
-                                                          style: AppUtils.instance
-                                                              .textStyle(
-                                                                  fontSize: 12),
-                                                        ),
-                                                      ),
-                                                      Flexible(
-                                                          child: Text(
-                                                        "${clinicalTest[index].prescription}",
-                                                        style: AppUtils.instance
-                                                            .textStyle(
-                                                                fontWeight:
-                                                                    FontWeight.bold,
-                                                                color: AppColors
-                                                                    .buttonColor,
-                                                                fontSize: 12),
-                                                      ))
-                                                    ]),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
                                       ),
-                                    )
-                            // )
-                          ],
-                        ),
-                      );
-                    }),
+                                    ),
+                                  )
+                                  // )
+                                ],
+                              ),
+                            );
+                          }),
+                    ],
+                  )
+                ),
               ],
             ),
           ),

@@ -35,6 +35,7 @@ class Data {
   String? address;
   int? gender;
   int? iV;
+  bool isCritical = false;
 
   Data(
       {this.sId,
@@ -46,7 +47,9 @@ class Data {
         this.height,
         this.address,
         this.gender,
-        this.iV});
+        this.iV,
+        this.isCritical = false
+      });
 
   Data.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];

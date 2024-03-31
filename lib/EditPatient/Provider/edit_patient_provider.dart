@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mapd722_group1/HomeScreen/home_screen.dart';
+import 'package:mapd722_group1/utils/preference_key.dart';
 import 'dart:async';
 
 import '../../Login/LoginScreen.dart';
@@ -59,10 +60,12 @@ class EditPatientProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         editPatientModel = EditPatientModel.fromJson(json.decode(response.body));
 
+        String userFirstName = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefFirstName) ?? "";
+        String userLastName = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefLastName) ?? "";
         if(editPatientModel.success== true){
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen(lastName: lastName,firstName: firstName)),
+            MaterialPageRoute(builder: (context) => HomeScreen(lastName: userLastName,firstName: userFirstName)),
           );
           AppUtils.instance.showToast(
               textColor: Colors.white,
@@ -164,6 +167,12 @@ class EditPatientProvider extends ChangeNotifier {
       isDoctor = false;
       notifyListeners();
     }
+  }
+
+  falseGender(){
+    isMale = false;
+    isFemale = false;
+    notifyListeners();
   }
 
 }
