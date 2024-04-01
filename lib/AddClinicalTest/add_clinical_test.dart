@@ -110,6 +110,7 @@ class _AddClinicalTestScreenState extends State<AddClinicalTestScreen> {
                           onTap: () {},
                           controller: bloodPressure,
                           focusNode: bloodPressureFocusNode,
+                          keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             // contentPadding: const EdgeInsets.only(left: 10),
                             border: const OutlineInputBorder(
@@ -148,6 +149,7 @@ class _AddClinicalTestScreenState extends State<AddClinicalTestScreen> {
                           onTap: () {},
                           controller: respiratoryRate,
                           focusNode: respiratoryRateFocusNode,
+                          keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(30.0)),
@@ -185,6 +187,7 @@ class _AddClinicalTestScreenState extends State<AddClinicalTestScreen> {
                           onTap: () {},
                           controller: bloodOxygenLevel,
                           focusNode: bloodOxygenLevelFocusNode,
+                          keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(30.0)),
@@ -230,6 +233,7 @@ class _AddClinicalTestScreenState extends State<AddClinicalTestScreen> {
                           onTap: () {},
                           controller: heartbeatRate,
                           focusNode: heartbeatRateFocusNode,
+                          keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             border: const OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(30.0)),
