@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 
+import '../../HomeScreen/home_screen.dart';
 import '../../Login/LoginScreen.dart';
 import '../../utils/api_network.dart';
 import '../../utils/app_color.dart';
 import '../../utils/app_utils.dart';
 import '../../utils/exceptions.dart';
+import '../../utils/preference_key.dart';
 import '../Model/update_profile_model.dart';
 
 class UpdateProfileProvider extends ChangeNotifier {
@@ -50,7 +52,13 @@ class UpdateProfileProvider extends ChangeNotifier {
         updateProfileModel = UpdateProfileModel.fromJson(json.decode(response.body));
 
         if(updateProfileModel.success== true){
+          AppUtils.instance.addPref(PreferenceKey.stringKey, PreferenceKey.prefFirstName,firstName);
+          AppUtils.instance.addPref(PreferenceKey.stringKey, PreferenceKey.prefLastName,lastName);
           // Navigator.pushReplacement(context, newRoute)
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen(firstName: firstName,lastName:lastName)),
+          );
 
           AppUtils.instance.showToast(
               textColor: Colors.white,

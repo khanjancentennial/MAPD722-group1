@@ -311,10 +311,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 ),
                                                               ),
                                                               const SizedBox(height: 5),
-                                                              Text("Patient Status:- ${searchByName.searchByNameModel.data![index].isCritical ? "Critical" : "Normal"}",
+                                                              Text("Patient Status:- ${searchByName.searchByNameModel.data![index].status}",
                                                                 style: AppUtils.instance.textStyle(
                                                                   fontSize: 16,
-                                                                  color: searchByName.searchByNameModel.data![index].isCritical ? AppColors.red : AppColors.green
+                                                                  color: searchByName.searchByNameModel.data![index].status == "critical" ? AppColors.red : AppColors.green
                                                                 ),
                                                               )
                                                             ],
@@ -422,8 +422,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             ),
                                                             const SizedBox(height: 10),
 
-                                                            widget.healthCareProvider.toString() == "0" ?
-
                                                             InkWell(
                                                               onTap: (){
                                                                 Navigator.push(context,
@@ -459,9 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   ),
                                                                 ),
                                                               ),
-                                                            ) :
-
-                                                                const SizedBox()
+                                                            )
                                                           ],
                                                         ),
 
@@ -529,10 +525,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                       ),
                                                                     ),
                                                                     const SizedBox(height: 5),
-                                                                    Text("Patient Status:- ${getAllPatientDetails.allPatientDetailsModel!.data![index].isCritical ? "Critical" : "Normal"}",
+                                                                    Text("Patient Status:- ${getAllPatientDetails.allPatientDetailsModel!.data![index].status}",
                                                                       style: AppUtils.instance.textStyle(
                                                                         fontSize: 16,
-                                                                        color: getAllPatientDetails.allPatientDetailsModel!.data![index].isCritical ? AppColors.red : AppColors.green
+                                                                        color: getAllPatientDetails.allPatientDetailsModel!.data![index].status == "critical"? AppColors.red : AppColors.green
                                                                       ),
                                                                     )
                                                                   ],
@@ -640,8 +636,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   ),
                                                                   const SizedBox(height: 10),
 
-                                                                  widget.healthCareProvider.toString() == "0" ?
-
                                                                   InkWell(
                                                                     onTap: (){
                                                                       Navigator.push(context,
@@ -677,9 +671,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                  ) :
-
-                                                                      const SizedBox()
+                                                                  )
                                                                 ],
                                                               ),
 

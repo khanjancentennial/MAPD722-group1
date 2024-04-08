@@ -9,6 +9,7 @@ import '../AddClinicalTest/add_clinical_test.dart';
 import '../AddPatient/add_patient_screen.dart';
 import '../EditClinicalTest/edit_clinical_test_screen.dart';
 import '../EditPatient/edit_patient_screen.dart';
+import '../HomeScreen/Provider/get_all_patient_provider.dart';
 import '../HomeScreen/home_screen.dart';
 import '../utils/app_color.dart';
 import '../utils/app_utils.dart';
@@ -114,7 +115,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           .size
                           .width-120,
                       child: Center(
-                        child: Text("All Tests",
+                        child: Text(userType == "0" ? "All Tests" : "All Details",
                             style: AppUtils.instance.textStyle(
                                 fontSize: 30,
                                 color: AppColors.buttonColor,
@@ -360,6 +361,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                       ),
                     ),
 
+                    userType == "0" ?
                     Flexible(
                       fit: FlexFit.tight,
                       child: Padding(
@@ -394,9 +396,13 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           ),
                         ),
                       )
-                    ),
+                    )
+
+                    : const SizedBox(),
                   ],
                 ),
+
+                userType == "0" ?
 
                 Consumer<AllClinicalTestProvider>(
                   builder: (_, getClinicalTests, child) =>
@@ -409,13 +415,20 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                   Column(
                     children: [
                       const SizedBox(height: 20),
-                      Text("Patient Status:- $status",
-                        style: AppUtils.instance.textStyle(
-                            fontSize: 20,
-                            color: status == "Critical"? AppColors.red : AppColors.green
-                        ),
-                      ),
+
+                    // Consumer<GetAllPatientProvider>(
+                    //   builder: (_, getClinicalTests, child) =>
+                    //   Text("Patient Status:- $status",
+                    //     style: AppUtils.instance.textStyle(
+                    //         fontSize: 20,
+                    //         color: status == "Critical"? AppColors.red : AppColors.green
+                    //     ),
+                    //   ),
+                    // ),
                       const SizedBox(height: 5),
+
+                      getClinicalTests.allClinicalTestList.isNotEmpty ?
+
                       ListView.builder(
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
@@ -817,10 +830,17 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                                 ],
                               ),
                             );
-                          }),
+                          })
+
+                          :
+
+                          const Center(child: Text("No Tests Found"),)
                     ],
                   )
-                ),
+                )
+
+                : const SizedBox()
+                ,
               ],
             ),
           ),
