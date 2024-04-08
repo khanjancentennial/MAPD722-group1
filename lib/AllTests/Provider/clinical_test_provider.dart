@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:mapd722_group1/AllTests/Model/clinical_test_model.dart';
 
 import 'dart:async';
@@ -20,6 +21,7 @@ import '../../utils/preference_key.dart';
 class AllClinicalTestProvider extends ChangeNotifier {
   AllClinicalTest? allClinicalTest;
   List<Data?> allClinicalTestList = [];
+  List<String> allClinicalTestListDate = [];
   bool isLoading=false;
 
 
@@ -36,9 +38,15 @@ class AllClinicalTestProvider extends ChangeNotifier {
 
         if(allClinicalTest!.success == true){
           allClinicalTestList = [];
+          allClinicalTestListDate = [];
           allClinicalTest!.data!.asMap().forEach((key, value) {
             if(value.patient!.sId.toString() == userId.toString()){
               allClinicalTestList.add(value);
+
+              DateTime parseTransferredDate = new DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").parse(value.creationDateTime!,true).toLocal();
+              var outputDate = DateFormat("yyyy-MM-dd' 'HH:mm:ss").format(parseTransferredDate);
+              allClinicalTestListDate.add(outputDate);
+
               notifyListeners();
             }
           }

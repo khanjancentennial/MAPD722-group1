@@ -32,7 +32,8 @@ class AddPatientProvider extends ChangeNotifier {
       String address,
       String gender,
       String userFirstName,
-      String userLastName
+      String userLastName,
+      String userType
       ) async {
 
 
@@ -47,6 +48,7 @@ class AddPatientProvider extends ChangeNotifier {
       "weight" : weight,
       "height" : height,
       "address" : address,
+      "status" : "normal"
 
     };
     try {
@@ -62,7 +64,7 @@ class AddPatientProvider extends ChangeNotifier {
         if(addPatientDetails.success== true){
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen(firstName: userFirstName,lastName: userLastName,)),
+            MaterialPageRoute(builder: (context) => HomeScreen(firstName: userFirstName,lastName: userLastName,healthCareProvider: userType,)),
           );
           AppUtils.instance.showToast(
               textColor: Colors.white,

@@ -35,6 +35,7 @@ class Data {
   String? address;
   int? gender;
   int? iV;
+  String? status;
   bool isCritical = false;
 
   Data(
@@ -48,6 +49,7 @@ class Data {
         this.address,
         this.gender,
         this.iV,
+        this.status,
         this.isCritical = false
       });
 
@@ -62,6 +64,7 @@ class Data {
     address = json['address'];
     gender = json['gender'];
     iV = json['__v'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -76,6 +79,7 @@ class Data {
     data['address'] = this.address;
     data['gender'] = this.gender;
     data['__v'] = this.iV;
+    data['status'] = this.status;
     return data;
   }
 }

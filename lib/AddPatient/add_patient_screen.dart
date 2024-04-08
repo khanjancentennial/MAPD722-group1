@@ -38,6 +38,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
 
   String userFirstName = '';
   String userLastName = '';
+  String userType = '';
 
   @override
   void initState() {
@@ -50,6 +51,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
     if (this.mounted) {
       userFirstName = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefFirstName);
       userLastName = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefLastName);
+      userType = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefUserType);
       setState(() {});
     }
   }
@@ -561,7 +563,8 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
             addressController.text,
             Provider.of<AddPatientProvider>(context,listen: false).isMale ? "0" : "1",
           userFirstName.toString(),
-          userLastName.toString()
+          userLastName.toString(),
+          userType.toString()
 
         );
 

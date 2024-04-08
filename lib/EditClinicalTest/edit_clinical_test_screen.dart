@@ -150,7 +150,10 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Please enter blood pressure";
-                            } else {
+                            }else if(int.parse(value) > 1000 || int.parse(value) < 1){
+                              return "Please enter valid blood pressure value";
+                            }
+                            else {
                               return null;
                             }
                           },
@@ -189,7 +192,11 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "please enter respiratory rate";
-                            } else {
+                            }
+                            else if(int.parse(value) > 1000 || int.parse(value) < 1){
+                              return "Please enter valid respiratory rate value";
+                            }
+                            else {
                               return null;
                             }
                           },
@@ -228,6 +235,11 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Please enter blood oxygen level";
+                            }
+                            else if(int.parse(value) > 1000 || int.parse(value) < 1){
+                              return "Please enter valid blood oxygen level value";
+                            }else {
+                              return null;
                             }
                             // else {
                             //   if(Provider.of<AddPatientProvider>(context,listen: false).emailStructure(value)){
@@ -277,7 +289,11 @@ class _EditClinicalTestState extends State<EditClinicalTest> {
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "please enter heartbeat rate";
-                            } else {
+                            }
+                            else if(int.parse(value) > 1000 || int.parse(value) < 1){
+                              return "Please enter valid heartbeat rate value";
+                            }
+                            else {
                               return null;
                             }
                           },

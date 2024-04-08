@@ -50,7 +50,7 @@ class LoginProvider extends ChangeNotifier {
                         builder: (context) =>
 
                             HomeScreen(firstName: loginData!.user!.firstName,
-                                lastName: loginData!.user!.lastName)
+                                lastName: loginData!.user!.lastName,healthCareProvider: loginData!.user!.healthcareProvider.toString())
 
                       // CustomerHomeScreen(firstName: loginData!.user!.firstName,
                       // lastName: loginData!.user!.lastName)

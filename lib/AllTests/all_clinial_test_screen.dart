@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mapd722_group1/AllTests/Provider/clinical_test_provider.dart';
 import 'package:mapd722_group1/HomeScreen/Provider/get_all_critical_patient_provider.dart';
 import 'package:provider/provider.dart';
@@ -35,8 +36,11 @@ class AllClinicalTestScreen extends StatefulWidget {
 
 class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
 
-  // String userId = '';
   String status = '';
+  String heathCareProvider = '';
+  String userFirstName = '';
+  String userLastName = '';
+  String userType = '';
   @override
   void initState() {
     // TODO: implement initState
@@ -47,7 +51,9 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
   Future<void>? getDetails() async {
     if (this.mounted) {
       status = '';
-      // userId = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefUserId);
+      userFirstName = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefFirstName);
+      userLastName = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefLastName);
+      userType = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefUserType);
 
       Provider.of<AllClinicalTestProvider>(context, listen: false).allClinicalTestMethod(context, widget.patientId!);
       Provider.of<GetAllCriticalPatientProvider>(context,listen: false).getAllCriticalPatientDetails(context).then((value) {
@@ -94,7 +100,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                           Navigator.pop(context);
                           Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => HomeScreen(firstName: widget.firstName,lastName: widget.lastName,)),
+                            MaterialPageRoute(builder: (context) => HomeScreen(firstName: userFirstName,lastName: userLastName,healthCareProvider: userType,)),
                           );
                         },
                         child: Container(
@@ -426,6 +432,12 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
 
+                                          // Padding(
+                                          //   padding: const EdgeInsets.only(left: 20,right: 20,top: 10),
+                                          //   child:
+                                          // ),
+
+
                                           Stack(
                                             clipBehavior: Clip.none,
                                             children: [
@@ -440,6 +452,16 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                                                         crossAxisAlignment:
                                                         CrossAxisAlignment.start,
                                                         children: [
+
+                                                          Text(
+                                                            "Test Date and Time ${getClinicalTests.allClinicalTestListDate[index]}",
+                                                            style: AppUtils.instance.textStyle(
+                                                                fontSize: 18,
+                                                                fontWeight: FontWeight.bold
+                                                            ),
+                                                          ),
+                                                          const SizedBox(height: 10),
+
                                                           Container(
                                                             width: MediaQuery.of(context)
                                                                 .size
@@ -473,7 +495,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                                                                 .size
                                                                 .width,
                                                             child: Text(
-                                                              "respiratoryRate : ${getClinicalTests.allClinicalTestList[index]!.respiratoryRate} ",
+                                                              "RespiratoryRate : ${getClinicalTests.allClinicalTestList[index]!.respiratoryRate} ",
                                                               style: AppUtils.instance
                                                                   .textStyle(
                                                                   fontSize: 13,
@@ -487,7 +509,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                                                                 .size
                                                                 .width,
                                                             child: Text(
-                                                              "blood Oxygen Level : ${getClinicalTests.allClinicalTestList[index]!.bloodOxygenLevel} ",
+                                                              "Blood Oxygen Level : ${getClinicalTests.allClinicalTestList[index]!.bloodOxygenLevel} ",
                                                               style: AppUtils.instance
                                                                   .textStyle(
                                                                   fontSize: 13,
@@ -673,7 +695,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                                                   child: Row(children: [
                                                     Container(
                                                       child: Text(
-                                                        "chief Complaint : ",
+                                                        "Chief Complaint : ",
                                                         style: AppUtils.instance
                                                             .textStyle(
                                                             fontSize: 12),
@@ -706,7 +728,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                                                   child: Row(children: [
                                                     Container(
                                                       child: Text(
-                                                        "past Medical History : ",
+                                                        "Past Medical History : ",
                                                         style: AppUtils.instance
                                                             .textStyle(
                                                             fontSize: 12),
@@ -735,7 +757,7 @@ class _AllClinicalTestScreenState extends State<AllClinicalTestScreen> {
                                                   child: Row(children: [
                                                     Container(
                                                       child: Text(
-                                                        "medical Diagnosis : ",
+                                                        "Medical Diagnosis : ",
                                                         style: AppUtils.instance
                                                             .textStyle(
                                                             fontSize: 12),

@@ -136,7 +136,11 @@ class _AddClinicalTestScreenState extends State<AddClinicalTestScreen> {
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Please enter blood pressure";
-                            } else {
+                            }
+                            else if(int.parse(value) > 1000 || int.parse(value) < 1){
+                              return "Please enter valid blood pressure value";
+                            }
+                            else {
                               return null;
                             }
                           },
@@ -174,7 +178,11 @@ class _AddClinicalTestScreenState extends State<AddClinicalTestScreen> {
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "please enter respiratory rate";
-                            } else {
+                            }
+                            else if(int.parse(value) > 1000 || int.parse(value) < 1){
+                              return "Please enter valid respiratory rate value";
+                            }
+                            else {
                               return null;
                             }
                           },
@@ -212,14 +220,12 @@ class _AddClinicalTestScreenState extends State<AddClinicalTestScreen> {
                             if (value!.isEmpty) {
                               return "Please enter blood oxygen level";
                             }
-                            // else {
-                            //   if(Provider.of<AddPatientProvider>(context,listen: false).emailStructure(value)){
-                            //     return null;
-                            //   }else{
-                            //     return "Please enter a valid email address";
-                            //   }
-                            //
-                            // }
+                            else if(int.parse(value) > 1000 || int.parse(value) < 1){
+                              return "Please enter valid blood oxygen level value";
+                            }else {
+                              return null;
+                            }
+
                           },
                           // onChanged: (emailValue){
                           //   Provider.of<AddPatientProvider>(context,listen: false).emailStructure(emailValue);
@@ -246,19 +252,16 @@ class _AddClinicalTestScreenState extends State<AddClinicalTestScreen> {
                               color: AppColors.grey,
                               fontWeight: FontWeight.w400,
                             ),
-                            // prefixIcon: Container(
-                            //   padding: const EdgeInsets.only(left: 5,right: 11),
-                            //   child: Image.asset(AppImage.user,
-                            //     scale: 20,
-                            //     // color: AppColors.grey,
-                            //   ),
-                            // ),
 
                           ),
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "please enter heartbeat rate";
-                            } else {
+                            }
+                            else if(int.parse(value) > 1000 || int.parse(value) < 1){
+                              return "Please enter valid heartbeat rate value";
+                            }
+                            else {
                               return null;
                             }
                           },

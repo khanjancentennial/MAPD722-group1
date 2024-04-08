@@ -62,10 +62,11 @@ class EditPatientProvider extends ChangeNotifier {
 
         String userFirstName = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefFirstName) ?? "";
         String userLastName = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefLastName) ?? "";
+        String userType = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefUserType) ?? "";
         if(editPatientModel.success== true){
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen(lastName: userLastName,firstName: userFirstName)),
+            MaterialPageRoute(builder: (context) => HomeScreen(lastName: userLastName,firstName: userFirstName,healthCareProvider: userType,)),
           );
           AppUtils.instance.showToast(
               textColor: Colors.white,

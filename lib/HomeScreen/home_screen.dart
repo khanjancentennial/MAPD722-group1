@@ -21,7 +21,8 @@ import 'Provider/get_all_patient_provider.dart';
 class HomeScreen extends StatefulWidget {
   String? firstName;
   String? lastName;
-  HomeScreen({this.lastName,this.firstName, super.key});
+  String? healthCareProvider;
+  HomeScreen({this.lastName,this.firstName, this.healthCareProvider,super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -29,6 +30,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
+
+  // String heathCareProvider = '';
+
+
   @override
   void initState() {
     // TODO: implement initState
@@ -38,6 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void>? getDetails() async {
     if (this.mounted) {
+      print(widget.healthCareProvider);
+      print(widget.healthCareProvider.runtimeType);
+      // heathCareProvider = await AppUtils.instance.getPreferenceValueViaKey(PreferenceKey.prefUserType);
+      // print(heathCareProvider);
+
       Provider.of<GetAllPatientProvider>(context, listen: false).getAllPatientDetails().then((value) {
         Provider.of<GetAllCriticalPatientProvider>(context, listen: false).getAllCriticalPatientDetails(context);
       });
@@ -375,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                                   ).then((value) {
                                                                                     Navigator.pushReplacement(
                                                                                       context,
-                                                                                      MaterialPageRoute(builder: (context) => HomeScreen(lastName: widget.lastName,firstName: widget.firstName,)),
+                                                                                      MaterialPageRoute(builder: (context) => HomeScreen(lastName: widget.lastName,firstName: widget.firstName,healthCareProvider: widget.healthCareProvider,)),
                                                                                     );
                                                                                   }
                                                                                   );
@@ -411,6 +421,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               ],
                                                             ),
                                                             const SizedBox(height: 10),
+
+                                                            widget.healthCareProvider.toString() == "0" ?
+
                                                             InkWell(
                                                               onTap: (){
                                                                 Navigator.push(context,
@@ -446,7 +459,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   ),
                                                                 ),
                                                               ),
-                                                            ),
+                                                            ) :
+
+                                                                const SizedBox()
                                                           ],
                                                         ),
 
@@ -588,7 +603,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                                         ).then((value) {
                                                                                           Navigator.pushReplacement(
                                                                                             context,
-                                                                                            MaterialPageRoute(builder: (context) => HomeScreen(lastName: widget.lastName,firstName: widget.firstName,)),
+                                                                                            MaterialPageRoute(builder: (context) => HomeScreen(lastName: widget.lastName,firstName: widget.firstName,healthCareProvider: widget.healthCareProvider,)),
                                                                                           );
                                                                                         }
                                                                                         );
@@ -624,6 +639,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                     ],
                                                                   ),
                                                                   const SizedBox(height: 10),
+
+                                                                  widget.healthCareProvider.toString() == "0" ?
+
                                                                   InkWell(
                                                                     onTap: (){
                                                                       Navigator.push(context,
@@ -659,7 +677,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                         ),
                                                                       ),
                                                                     ),
-                                                                  ),
+                                                                  ) :
+
+                                                                      const SizedBox()
                                                                 ],
                                                               ),
 
@@ -693,337 +713,3 @@ class _HomeScreenState extends State<HomeScreen> {
     Container();
   }
 }
-
-
-
-//
-//
-// ListView.builder(
-// shrinkWrap: true,
-// physics: NeverScrollableScrollPhysics(),
-// itemCount: getStowData.newStowList.length,
-// itemBuilder: (context,index){
-// return Padding(
-// padding: const EdgeInsets.only(left: 15,right: 15,bottom: 10),
-// child: Column(
-// children: [
-// Container(
-// child: Card(
-// child: Column(
-// crossAxisAlignment: CrossAxisAlignment.start,
-// children: [
-// Container(
-// padding: EdgeInsets.only(left: 20,right: 15,top: 10,bottom: 10),
-//
-// child: RichText(
-// text: TextSpan(
-// children: [
-// TextSpan(
-// text:  "PO number: ",
-// style: AppUtils.instance.textStyle(
-// color: AppColors.buttonColor,
-// fontSize: 12)
-// ),
-// TextSpan(
-// text:  "${getStowData.newStowList[index].poNumber} ",
-// style: AppUtils.instance.textStyle(
-// color: AppColors.buttonColor,
-// fontSize: 12,
-// fontWeight: FontWeight.bold)
-// ),
-// TextSpan(
-// text:  "/ Line Item No. ",
-// style: AppUtils.instance.textStyle(
-// color: AppColors.buttonColor,
-// fontSize: 12)
-// ),
-// TextSpan(
-// text:  "${getStowData.newStowList[index].lineItemNo} ",
-// style: AppUtils.instance.textStyle(
-// color: AppColors.buttonColor,
-// fontSize: 12,
-// fontWeight: FontWeight.bold)
-// ),
-// TextSpan(
-// text:  "/ ",
-// style: AppUtils.instance.textStyle(
-// color: AppColors.buttonColor,
-// fontSize: 12)
-// ),
-// TextSpan(
-// text:  "${getStowData.newStowList[index].vendorName}",
-// style: AppUtils.instance.textStyle(
-// color: AppColors.buttonColor,
-// fontSize: 12,
-// fontWeight: FontWeight.bold)
-// ),
-// ],
-// ),
-// ),
-//
-// // child: Text(
-// //       "PO number: ${provider.stowItemDetailModel!.data![index].poNumber} / Line Item No. ${provider.searchPOModel!.data![index].lineItemNo} / ${provider.searchPOModel!.data![index].vendorName}"
-// //   ),
-//
-// ),
-// SizedBox(
-// height: 1,
-// width: MediaQuery.of(context).size.width,
-// child: Container(
-// color: AppColors.grey,
-// ),
-// ),
-// Stack(
-// clipBehavior:Clip.none ,
-// children: [
-// Container(
-// padding: EdgeInsets.only(top: 10,bottom: 10,left: 20),
-// child: Column(
-// crossAxisAlignment: CrossAxisAlignment.start,
-// children: [
-// Row(
-// children: [
-// Flexible(
-// child: Container(
-// width: MediaQuery.of(context).size.width,
-// child: Text("Vendor Part : ${getStowData.newStowList[index].vendorPartNumber} ",
-// style: AppUtils.instance.textStyle(
-// fontSize: 13,fontWeight: FontWeight.bold
-// ),
-// ),
-// ),
-// ),
-// SizedBox(width: 5),
-//
-// Padding(
-// padding: const EdgeInsets.only(right: 20),
-// child: InkWell(
-// onDoubleTap: () => null,
-// onTap: (){
-// print(index);
-// getStowData.checkItem(index,context);
-//
-// print(getStowData.newStowList[index].isChecked);
-// },
-// child: Consumer<StowDetailProvider>(
-// builder: (_,selectValueGet,child) {
-// return CircleAvatar(
-// radius: 11,
-// backgroundColor: selectValueGet.newStowList[index].isChecked?
-// AppColors.green:Colors.grey[400],
-// child: Center(
-// child: Icon(
-// Icons.check,
-// color: AppColors.white,
-// size: 15,
-// )
-// )
-// );
-// }
-// ),
-// ),
-// ),
-//
-// ],
-// ),
-// /* SizedBox(height: 5),
-//                                                                       RichText(
-//                                                                         text: TextSpan(
-//                                                                           children: [
-//                                                                             TextSpan(
-//                                                                                 text:  "Description : ",
-//                                                                                 style: AppUtils.instance.textStyle(
-//                                                                                     fontSize: 12)
-//                                                                             ),
-//                                                                             TextSpan(
-//                                                                                 text:  "${provider.stowItemDetailModel!.data![index].vendorName}",
-//                                                                                 style: AppUtils.instance.textStyle(
-//                                                                                     fontSize: 12,
-//                                                                                     fontWeight: FontWeight.bold)
-//                                                                             ),
-//                                                                           ],
-//                                                                         ),
-//                                                                       ),*/
-// ],
-// ),
-// ),
-// Positioned.fill(
-// left: -11,
-// child: Align(
-// alignment: Alignment.centerLeft,
-// child: InkWell(
-// onDoubleTap: () => null,
-// onTap: (){
-// Provider.of<StowDetailProvider>(context,listen: false).hideShowMenu(index);
-// print(getStowData.newStowList[index].isExpanded);
-// },
-// child: CircleAvatar(
-// radius: 11,
-// backgroundColor: AppColors.buttonColor,
-// child: Center(
-// child: Consumer<StowDetailProvider>(
-// builder: (_,getExpandedData,child) =>  Icon(
-// getExpandedData.newStowList[index].isExpanded ?
-// Icons.remove :
-// Icons.add,
-// color: AppColors.white,
-// size: 15,
-// ),
-// ),
-// )
-// ),
-// ),
-// ),
-// )
-// ],
-// ),
-// ],
-// ),
-// ),
-// ),
-// Consumer<StowDetailProvider>(
-// builder: (_,visibleValueGet,child) => Visibility(
-// visible: visibleValueGet.newStowList[index].isExpanded == true,
-// // visible : true,
-// child: Padding(
-// padding: const EdgeInsets.only(left: 5,right: 5),
-// child: Container(
-// color: AppColors.white,
-// child:Padding(
-// padding: const EdgeInsets.only(top: 15),
-// child: Column(
-// children: [
-// Container(
-// padding: EdgeInsets.only(left: 20),
-// height: 30,
-// child: Align(
-// alignment: Alignment.centerLeft,
-// child:  Row(
-// children: [
-// Container(
-// child: Text("Item Status : ",
-// style: AppUtils.instance.textStyle(
-// fontSize: 12
-// ),
-// ),
-// ),
-// Flexible(
-// child: Text("${getStowData.newStowList[index].itemStatus == "0" ? "Normal":"Damaged"}",
-// style: AppUtils.instance.textStyle(
-// fontWeight: FontWeight.bold,
-// fontSize: 12,color: AppColors.buttonColor
-// ),
-// )
-// )
-// ]
-// ),
-// ),
-// ),
-// Container(
-// padding: EdgeInsets.only(left: 20),
-// height: 30,
-// width: MediaQuery.of(context).size.width,
-// color: AppColors.dropDownColorExpand,
-// child: Align(
-// alignment:Alignment.centerLeft ,
-// child: Row(
-// children: [
-// Container(
-// child: Text("Received Date, Time : ",
-// style: AppUtils.instance.textStyle(
-// fontSize: 12
-// ),
-// ),
-// ),
-// Flexible(
-// child: Text("${getStowData.addDate.isEmpty ? "":getStowData.addDate[index]}"
-// "${getStowData.addDate.isEmpty ? "":getStowData.addDate[index] == "01" ||
-// getStowData.addDate.isEmpty ? "":getStowData.addDate[index] == "21" ||
-// getStowData.addDate.isEmpty ? "":getStowData.addDate[index] == "31"? "st"
-//     :
-// getStowData.addDate.isEmpty ? "":getStowData.addDate[index] == "02" ||
-// getStowData.addDate.isEmpty ? "":getStowData.addDate[index] == "22"? "nd"
-//     :
-// getStowData.addDate.isEmpty ? "":getStowData.addDate[index] == "03" ? "rd":"th"} "
-// "${getStowData.addMonth.isEmpty ? "":getStowData.addMonth[index]} "
-// "${getStowData.addMonth.isEmpty ? "":getStowData.addTime[index]}",
-// style: AppUtils.instance.textStyle(
-// fontWeight: FontWeight.bold,
-// color: AppColors.buttonColor,
-// fontSize: 12
-// ),
-// )
-// )
-// ]
-// ),
-// ),
-// ),
-// Container(
-// padding: EdgeInsets.only(left: 20),
-// height: 30,
-// // color: AppColors.dropDownColorExpand,
-// child: Align(
-// alignment: Alignment.centerLeft,
-// child: Row(
-// children: [
-// Container(
-// child: Text("Update Location : ",
-// style: AppUtils.instance.textStyle(
-// fontSize: 12
-// ),
-// ),
-// ),
-// Flexible(
-// child: Text("${getStowData.newStowList[index].locationId == "" || getStowData.newStowList[index].locationId == null
-// ? "Not Assigned" :getStowData.newStowList[index].locationId}",
-// style: AppUtils.instance.textStyle(
-// fontWeight: FontWeight.bold,
-// color: AppColors.buttonColor,
-// fontSize: 12
-// ),
-// )
-// )
-// ]
-// ),
-// ),
-// ),
-// Container(
-// padding: EdgeInsets.only(left: 20),
-// height: 30,
-// color: AppColors.dropDownColorExpand,
-// child: Align(
-// alignment:Alignment.centerLeft ,
-// child: Row(
-// children: [
-// Container(
-// child: Text("Location Status : ",
-// style: AppUtils.instance.textStyle(
-// fontSize: 12
-// ),
-// ),
-// ),
-// Flexible(
-// child: Text("${getStowData.newStowList[index].itemLocationStatus}",
-// style: AppUtils.instance.textStyle(
-// fontWeight: FontWeight.bold,
-// color: AppColors.buttonColor,
-// fontSize: 12
-// ),
-// )
-// )
-// ]
-// ),
-// ),
-// ),
-// ],
-// ),
-// ),
-// ),
-// ),
-// )
-// )
-// ],
-// ),
-// );
-//
-// }),
